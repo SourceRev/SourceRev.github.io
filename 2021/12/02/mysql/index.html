@@ -1,0 +1,281 @@
+<!DOCTYPE html>
+
+<html lang="en">
+
+<head>
+    
+    <title>Hexo</title>
+    <meta charset="UTF-8">
+    <meta name="keywords" content="">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=5">
+    
+    
+
+    <link rel="shortcut icon" href="/favicon.ico" type="image/x-icon" />
+    <meta name="description" content="基本语法外部语法远程连接数据库12&#x2F;&#x2F;本机可填localhost&gt;mysql -uroot -p123456 -h 服务端地址  默认以utf8来创建数据库123&gt;vim &#x2F;etc&#x2F;my.cnf&#x2F;&#x2F;在[mysqld]随即一行添加如下:character_set_server&#x3D;utf8  创建特殊的数据库名 含有非法字符、保留关键字的处理方法  1234#利用反引号将名字括起来creat">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Hexo">
+<meta property="og:url" content="http://example.com/2021/12/02/mysql/index.html">
+<meta property="og:site_name" content="Hexo">
+<meta property="og:description" content="基本语法外部语法远程连接数据库12&#x2F;&#x2F;本机可填localhost&gt;mysql -uroot -p123456 -h 服务端地址  默认以utf8来创建数据库123&gt;vim &#x2F;etc&#x2F;my.cnf&#x2F;&#x2F;在[mysqld]随即一行添加如下:character_set_server&#x3D;utf8  创建特殊的数据库名 含有非法字符、保留关键字的处理方法  1234#利用反引号将名字括起来creat">
+<meta property="og:locale" content="en_US">
+<meta property="article:published_time" content="2021-12-02T02:17:40.480Z">
+<meta property="article:modified_time" content="2021-12-02T02:17:40.481Z">
+<meta property="article:author" content="John Doe">
+<meta name="twitter:card" content="summary">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/combine/npm/highlight.js@9.15.8/styles/atom-one-dark.css,npm/justifiedGallery@3.8.1/dist/css/justifiedGallery.min.css,gh/fancyapps/fancybox@3.5.7/dist/jquery.fancybox.min.css,npm/hexo-theme-nexmoe@latest/source/lib/mdui_043tiny/css/mdui.css,npm/hexo-theme-nexmoe@latest/source/lib/iconfont/iconfont.css?v=233" crossorigin>
+    <link rel="stylesheet" href="/css/style.css?v=1638426744096">
+     
+    
+    <link rel="stylesheet" href="/lib/iconfont/iconfont.css?v=1638426744096">
+    
+<meta name="generator" content="Hexo 5.4.0"></head>
+
+<body class="mdui-drawer-body-left">
+    
+    <div id="nexmoe-background">
+        <div class="nexmoe-bg" style="background-image: url(https://cdn.jsdelivr.net/gh/nexmoe/nexmoe.github.io@latest/images/cover/5c3aec85a4343.jpg)"></div>
+        <div class="mdui-appbar mdui-shadow-0">
+            <div class="mdui-toolbar">
+                <a mdui-drawer="{target: '#drawer', swipe: true}" title="menu" class="mdui-btn mdui-btn-icon mdui-ripple"><i class="mdui-icon nexmoefont icon-menu"></i></a>
+                <div class="mdui-toolbar-spacer"></div>
+                <!--<a href="javascript:;" class="mdui-btn mdui-btn-icon"><i class="mdui-icon material-icons">search</i></a>-->
+                <a href="/" title="John Doe" class="mdui-btn mdui-btn-icon"><img src="https://cdn.jsdelivr.net/gh/nexmoe/nexmoe.github.io@latest/images/avatar.png" alt="John Doe"></a>
+            </div>
+        </div>
+    </div>
+    <div id="nexmoe-header">
+        <div class="nexmoe-drawer mdui-drawer" id="drawer">
+    <div class="nexmoe-avatar mdui-ripple">
+        <a href="/" title="John Doe">
+            <img src="https://cdn.jsdelivr.net/gh/nexmoe/nexmoe.github.io@latest/images/avatar.png" alt="John Doe" alt="John Doe">
+        </a>
+    </div>
+    <div class="nexmoe-count">
+        <div><span>Articles</span>3</div>
+        <div><span>Tags</span>0</div>
+        <div><span>Categories</span>0</div>
+    </div>
+    <div class="nexmoe-list mdui-list" mdui-collapse="{accordion: true}">
+        
+        <a class="nexmoe-list-item mdui-list-item mdui-ripple false" href="/" title="回到首页">
+            <i class="mdui-list-item-icon nexmoefont icon-home"></i>
+            <div class="mdui-list-item-content">
+                回到首页
+            </div>
+        </a>
+        
+        <a class="nexmoe-list-item mdui-list-item mdui-ripple false" href="/about.html" title="关于博客">
+            <i class="mdui-list-item-icon nexmoefont icon-info-circle"></i>
+            <div class="mdui-list-item-content">
+                关于博客
+            </div>
+        </a>
+        
+        <a class="nexmoe-list-item mdui-list-item mdui-ripple false" href="/PY.html" title="我的朋友">
+            <i class="mdui-list-item-icon nexmoefont icon-unorderedlist"></i>
+            <div class="mdui-list-item-content">
+                我的朋友
+            </div>
+        </a>
+        
+    </div>
+    <aside id="nexmoe-sidebar">
+    
+    <div class="nexmoe-widget-wrap">
+    <div class="nexmoe-widget nexmoe-search">
+         
+            <form id="search_form" action_e="https://cn.bing.com/search?q=site:nexmoe.com" onsubmit="return search();">
+                <label><input id="search_value" name="q" type="search" placeholder="Search"></label>
+            </form>
+         
+    </div>
+</div>
+    
+    <div class="nexmoe-widget-wrap">
+    <div class="nexmoe-widget nexmoe-social">
+        <a class="mdui-ripple" href="https://jq.qq.com/?_wv=1027&k=5CfKHun" target="_blank" mdui-tooltip="{content: 'QQ群'}" style="color: rgb(249, 174, 8);background-color: rgba(249, 174, 8, .1);">
+            <i class="nexmoefont icon-QQ"></i>
+        </a><a class="mdui-ripple" href="https://space.bilibili.com/20238211" target="_blank" mdui-tooltip="{content: '哔哩哔哩'}" style="color: rgb(231, 106, 141);background-color: rgba(231, 106, 141, .15);">
+            <i class="nexmoefont icon-bilibili"></i>
+        </a><a class="mdui-ripple" href="https://github.com/nexmoe/" target="_blank" mdui-tooltip="{content: 'GitHub'}" style="color: rgb(25, 23, 23);background-color: rgba(25, 23, 23, .15);">
+            <i class="nexmoefont icon-github"></i>
+        </a>
+    </div>
+</div>
+    
+    
+
+    
+    
+    
+</aside>
+    <div class="nexmoe-copyright">
+        &copy; 2021 John Doe
+        Powered by <a href="http://hexo.io/" target="_blank">Hexo</a>
+        & <a href="https://github.com/theme-nexmoe/hexo-theme-nexmoe" target="_blank">Nexmoe</a>
+        <br><a target="_blank" href="https://www.upyun.com/?utm_source=lianmeng&utm_medium=referral"><img src="https://i.dawnlab.me/c0268c1e6cfd0863d6ba35be1575941a.png" width="150px"></a><script data-ad-client="ca-pub-2058306854838448" async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js"></script>
+    </div>
+</div><!-- .nexmoe-drawer -->
+    </div>
+    <div id="nexmoe-content">
+        <div class="nexmoe-primary">
+            <div class="nexmoe-post">
+
+  <article>
+      
+          <div class="nexmoe-post-cover" style="padding-bottom: NaN%;"> 
+              <img data-src="https://cdn.jsdelivr.net/npm/butterfly-extsrc@1/img/default.jpg" data-sizes="auto" alt="" class="lazyload">
+              <h1></h1>
+          </div>
+      
+      
+      <div class="nexmoe-post-meta nexmoe-rainbow" style="margin:10px 0!important;">
+    <a><i class="nexmoefont icon-calendar-fill"></i>2021年12月02日</a>
+    <a><i class="nexmoefont icon-areachart"></i>829 字</a>
+    <a><i class="nexmoefont icon-time-circle-fill"></i>大概 3 分钟</a>
+</div>
+
+      
+
+      <h2 id="基本语法"><a href="#基本语法" class="headerlink" title="基本语法"></a>基本语法</h2><h4 id="外部语法"><a href="#外部语法" class="headerlink" title="外部语法"></a>外部语法</h4><h5 id="远程连接数据库"><a href="#远程连接数据库" class="headerlink" title="远程连接数据库"></a>远程连接数据库</h5><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">//本机可填localhost</span><br><span class="line">&gt;mysql -uroot -p123456 -h 服务端地址</span><br></pre></td></tr></table></figure>
+
+<h5 id="默认以utf8来创建数据库"><a href="#默认以utf8来创建数据库" class="headerlink" title="默认以utf8来创建数据库"></a>默认以utf8来创建数据库</h5><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">&gt;vim /etc/my.cnf</span><br><span class="line">//在[mysqld]随即一行添加如下:</span><br><span class="line">character_set_server=utf8</span><br></pre></td></tr></table></figure>
+
+<h5 id="创建特殊的数据库名"><a href="#创建特殊的数据库名" class="headerlink" title="创建特殊的数据库名"></a>创建特殊的数据库名</h5><ol>
+<li>含有非法字符、保留关键字的处理方法</li>
+</ol>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">#利用反引号将名字括起来</span><br><span class="line">create database `test-abc`</span><br><span class="line">#但实际是将字符转化为特殊符号进行储存</span><br><span class="line">`test-abc` = test@cabc</span><br></pre></td></tr></table></figure>
+
+<ol start="2">
+<li>数据库名称中不能含有*<em>,/,:,?,</em>,&lt;,&gt;,|**等字符</li>
+<li>数据库不能重名</li>
+</ol>
+<h4 id="内部语法"><a href="#内部语法" class="headerlink" title="内部语法"></a>内部语法</h4><h5 id="测试网站是否支持php"><a href="#测试网站是否支持php" class="headerlink" title="测试网站是否支持php"></a>测试网站是否支持php</h5><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">vim index.php//探针文件</span><br><span class="line">&lt;?php</span><br><span class="line">	phpinfo();</span><br><span class="line">?&gt;</span><br></pre></td></tr></table></figure>
+
+<h5 id="更改文件权限"><a href="#更改文件权限" class="headerlink" title="更改文件权限"></a>更改文件权限</h5><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"># chown apache.apache 目标文件名/ -R</span><br></pre></td></tr></table></figure>
+
+<h5 id="免登录执行指令"><a href="#免登录执行指令" class="headerlink" title="免登录执行指令"></a>免登录执行指令</h5><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">mysql -uroot -p123456 -e &quot;执行命令&quot;</span><br></pre></td></tr></table></figure>
+
+<h5 id="增加"><a href="#增加" class="headerlink" title="增加"></a>增加</h5><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">create database 数据库名	#创建一个新的数据库</span><br><span class="line">show create database 数据库名	#查看创建的过程</span><br><span class="line">create database 数据库名 CHARACTER SET utf8	#以utf-8的格式创建数据库</span><br><span class="line">create database if not exists 数据库名; #如果不存在则创建该数据库</span><br><span class="line"></span><br><span class="line">#字段：</span><br><span class="line">insert into (数据库名.)表名 values (每一个字段所要赋的值);#数据库表中插入字段</span><br><span class="line">insert into (数据库名.)表名 values (每一个字段所要赋的值),(同前);#数据库表中插入多个字段</span><br></pre></td></tr></table></figure>
+
+<h5 id="查询"><a href="#查询" class="headerlink" title="查询"></a>查询</h5><p><strong>select</strong>:</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">select database();#查询当前正在使用的数据库</span><br><span class="line">select now();	  #输出系统当前时间</span><br><span class="line">select user();	  #输出当前使用数据库的使用者</span><br><span class="line">select * from (数据库名.)表名;#查询表中所有字段</span><br><span class="line">select * from (数据库名.)表名\G;#查询表中所有字段(按行输出)</span><br><span class="line">select * from 表名 where 字段 is null;#当字段赋值为空时进行的查询</span><br><span class="line">select distinct 字段 from 表名;#去重查询</span><br></pre></td></tr></table></figure>
+
+<p><strong>desc</strong>:</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">desc 表名; #查看表的结构</span><br></pre></td></tr></table></figure>
+
+<h5 id="删除"><a href="#删除" class="headerlink" title="删除"></a>删除</h5><p><strong>drop</strong>:</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">drop database 数据库名;  #删除数据库</span><br><span class="line">drop database `数据库名`;#删除带特殊符号的数据库</span><br><span class="line">drop database if exists 数据库名; #如果数据库存在，则删除它</span><br></pre></td></tr></table></figure>
+
+<p><strong>delete</strong>:</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">delete from 表名 [where 筛选条件(例如：age=21 and id=3)];</span><br><span class="line">delete * from 表名 where 字段 is null;#当字段赋值为空时进行的删除</span><br></pre></td></tr></table></figure>
+
+<h5 id="修改"><a href="#修改" class="headerlink" title="修改"></a>修改</h5><p><strong>alter</strong>:</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">alter table 表名 rename 字段; #修改数据库的表名</span><br><span class="line">alter table 表名 modify 需要修改的字段 int(数值); #修改表中字段的长度（表的结构）</span><br><span class="line">alter table 表名 change 旧字段 新字段 类型(例如：varchar(30));#修改表中的字段名</span><br><span class="line"></span><br><span class="line">alter table 表名 add 新字段 enum(); #从表末新增表名，同时给表定义一个枚举的类型</span><br><span class="line">alter table 表名 add 新字段 int(20) first; #从表头新增表名，同时给表定义整形</span><br><span class="line">alter table 表名 add 新字段 int(20) after 字段; #从指定的位置后新增表名，同时给表定义整形</span><br><span class="line">alter table 表名 drop 字段名;#删除字段，内容也被清除</span><br></pre></td></tr></table></figure>
+
+<h5 id="change和modify的区别"><a href="#change和modify的区别" class="headerlink" title="change和modify的区别"></a>change和modify的区别</h5><p><strong>CHANGE</strong> 对列进行重命名和更改列的类型，需给定旧的列名称和新的列名称、当前的类型。</p>
+<p><strong>MODIFY</strong> 可以改变列的类型，此时不需要重命名（不需给定新的列名称）。</p>
+<p><strong>update</strong>:</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">update 表名 set 字段=&#x27;123&#x27; where id=5;</span><br></pre></td></tr></table></figure>
+
+
+
+<h2 id="基本信息"><a href="#基本信息" class="headerlink" title="基本信息"></a>基本信息</h2><ol>
+<li>在mysql-&gt;user的表中存放root用户的许可信息，可以限制远程连接主机的权限。</li>
+</ol>
+
+  </article>
+
+  
+      
+    <div class="nexmoe-post-copyright">
+        <strong>Author：</strong>John Doe<br>
+        <strong>Link：</strong><a href="http://example.com/2021/12/02/mysql/" title="http:&#x2F;&#x2F;example.com&#x2F;2021&#x2F;12&#x2F;02&#x2F;mysql&#x2F;" target="_blank" rel="noopener">http:&#x2F;&#x2F;example.com&#x2F;2021&#x2F;12&#x2F;02&#x2F;mysql&#x2F;</a><br>
+        
+            <strong>版权声明：</strong>本文采用 <a href="https://creativecommons.org/licenses/by-nc-sa/3.0/cn/deed.zh" target="_blank">CC BY-NC-SA 3.0 CN</a> 协议进行许可
+        
+    </div>
+
+
+  
+  
+  <div class="nexmoe-post-meta nexmoe-rainbow">
+    
+    
+</div>
+
+  
+      <div class="nexmoe-post-footer">
+          <section class="nexmoe-comment">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/gitalk@latest/dist/gitalk.min.css">
+<div id="gitalk"></div>
+<script src="https://cdn.jsdelivr.net/npm/gitalk@latest/dist/gitalk.min.js"></script>
+<script type="text/javascript">
+    var gitalk = new Gitalk({
+        clientID: '80b2453b6d5f37ad6225',
+        clientSecret: '43e99fa852795c9a7b3eb924b2558c64b84bbdeb',
+        id: window.location.pathname,
+        repo: 'nexmoe.github.io',
+        owner: 'nexmoe',
+        admin: 'nexmoe'
+    })
+    gitalk.render('gitalk')
+</script>
+</section>
+      </div>
+  
+</div>
+            <div class="nexmoe-post-right">
+              <div class="nexmoe-fixed">
+                  <div class="nexmoe-tool"> 
+                    
+                      
+                    
+                      <a href="#nexmoe-content" class="toc-link" aria-label="回到顶部" title="top"><button class="mdui-fab mdui-ripple"><i class="nexmoefont icon-caret-top"></i></button></a>
+                  </div>
+              </div>
+            </div>
+        </div>
+    </div>
+     
+    <div id="nexmoe-search-space">
+        <div class="search-container">
+            <div class="search-header">
+                <div class="search-input-container">
+                    <input class="search-input" type="text" placeholder="Search" oninput="sinput();">
+                </div>
+                <a class="search-close" onclick="sclose();">×</a>
+            </div>
+            <div class="search-body"></div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/combine/npm/lazysizes@5.1.0/lazysizes.min.js,npm/mdui@0.4.3/dist/js/mdui.min.js?v=1"></script>
+<script src="https://cdn.jsdelivr.net/npm/jquery@3.5.1/dist/jquery.min.js"></script>
+<script src="https://cdn.jsdelivr.net/gh/fancyapps/fancybox@3.5.7/dist/jquery.fancybox.min.js"></script>
+
+ 
+
+<script async src="/js/app.js?v=1638426744098"></script>
+
+
+
+<script src="https://cdn.jsdelivr.net/npm/justifiedGallery@3.8.1/dist/js/jquery.justifiedGallery.min.js"></script>
+<script>
+	$(".justified-gallery").justifiedGallery({
+		rowHeight: 160,
+		margins: 10,
+	});
+</script>
+
+
+    
+
+
+
+
+
+</body>
+
+</html>
