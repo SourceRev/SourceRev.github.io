@@ -1,0 +1,523 @@
+<!doctype html>
+<html lang="zh"><head>
+<title>深度学习基础 - Ciallo～(∠・ω&lt; )⌒★，欢迎来到SourceRev的个人博客</title>
+<meta charset="UTF-8">
+<meta name="keywords" content="">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=5">
+
+<link rel="shortcut icon" href="https://cravatar.cn/avatar/d4bd192ba44e2f9f35347b5123c7fa7e?s=400&amp;r=G&amp;d=mp&amp;ver=1681303077" type="image/jpg" />
+<meta name="description" content="感知机定义：感知机接收多个输入信号，输出一个信号。  $x_1$、$x_2$是输入信号， $y$是输出信号，$w_1$、$w_2$是权重。输入信号被送往神经元时，会被分别乘以固定的权重$(w_1x_1、w_2x_2)$。 神经元会计算传送过来的信号的总和，只有当这个总和超过 了某个界限值时，才会输出1。这也称为“神经元被激活”。这里将这个界限值称为阈值，用符号$θ$表示。  数学表示  感知机的多">
+<meta property="og:type" content="article">
+<meta property="og:title" content="深度学习基础">
+<meta property="og:url" content="http://sourcerev.github.io/2022/11/16/deeplearning/index.html">
+<meta property="og:site_name" content="Ciallo～(∠・ω&lt; )⌒★，欢迎来到SourceRev的个人博客">
+<meta property="og:description" content="感知机定义：感知机接收多个输入信号，输出一个信号。  $x_1$、$x_2$是输入信号， $y$是输出信号，$w_1$、$w_2$是权重。输入信号被送往神经元时，会被分别乘以固定的权重$(w_1x_1、w_2x_2)$。 神经元会计算传送过来的信号的总和，只有当这个总和超过 了某个界限值时，才会输出1。这也称为“神经元被激活”。这里将这个界限值称为阈值，用符号$θ$表示。  数学表示  感知机的多">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="http://sourcerev.github.io/avatar/dpl-1.jpg">
+<meta property="og:image" content="http://sourcerev.github.io/avatar/dpl-2.jpg">
+<meta property="og:image" content="http://sourcerev.github.io/avatar/dpl-3.jpg">
+<meta property="og:image" content="http://sourcerev.github.io/avatar/dpl-4.jpg">
+<meta property="og:image" content="http://sourcerev.github.io/avatar/dpl-5.jpg">
+<meta property="og:image" content="http://sourcerev.github.io/avatar/dpl-6.jpg">
+<meta property="og:image" content="http://sourcerev.github.io/avatar/dpl-7.jpg">
+<meta property="og:image" content="http://sourcerev.github.io/avatar/dpl-8.jpg">
+<meta property="og:image" content="http://sourcerev.github.io/avatar/dpl-9.jpg">
+<meta property="og:image" content="http://sourcerev.github.io/avatar/dpl-11.jpg">
+<meta property="og:image" content="http://sourcerev.github.io/avatar/dpl-10.jpg">
+<meta property="article:published_time" content="2022-11-16T05:23:56.000Z">
+<meta property="article:modified_time" content="2023-04-12T13:10:47.093Z">
+<meta property="article:author" content="SourceRev">
+<meta property="article:tag" content="算法">
+<meta property="article:tag" content="神经网络">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="http://sourcerev.github.io/avatar/dpl-1.jpg">
+
+<link rel="stylesheet" href="/lib/fancybox/fancybox.css">
+<link rel="stylesheet" href="/lib/mdui_043tiny/mdui.css">
+
+
+<link rel="stylesheet" href="/lib/iconfont/iconfont.css?v=1681305066789">
+
+<link rel="stylesheet" href="/css/style.css?v=1681305066789">
+
+
+
+
+
+<link rel="stylesheet" href="/custom.css?v=1681305066789">
+
+
+
+
+<script src="/lib/mdui_043tiny/mdui.js" async></script>
+<script src="/lib/fancybox/fancybox.umd.js" async></script>
+
+
+<script async src="/js/app.js?v=1681305066789"></script>
+
+
+
+<!-- Global site tag (gtag.js) - Google Analytics -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-4D4ZJ9G024"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag("js", new Date());
+
+  gtag("config", "G-4D4ZJ9G024");
+</script>
+<meta name="generator" content="Hexo 6.3.0"></head><body class="nexmoe mdui-drawer-body-left"><div id="nexmoe-background"><div class="nexmoe-bg" style="background-image: url(/img/44.png)"></div><div class="mdui-appbar mdui-shadow-0"><div class="mdui-toolbar"><a class="mdui-btn mdui-btn-icon mdui-ripple" mdui-drawer="{target: &#039;#drawer&#039;, swipe: true}" title="menu"><i class="mdui-icon nexmoefont icon-menu"></i></a><div class="mdui-toolbar-spacer"></div><a class="mdui-btn mdui-btn-icon" href="/" title="SourceRev"><img src="https://cravatar.cn/avatar/d4bd192ba44e2f9f35347b5123c7fa7e?s=400&amp;r=G&amp;d=mp&amp;ver=1681303077" alt="SourceRev"></a></div></div></div><div id="nexmoe-header"><div class="nexmoe-drawer mdui-drawer" id="drawer">
+    <div class="nexmoe-avatar mdui-ripple">
+        <a href="/" title="SourceRev">
+            <img src="https://cravatar.cn/avatar/d4bd192ba44e2f9f35347b5123c7fa7e?s=400&amp;r=G&amp;d=mp&amp;ver=1681303077" alt="SourceRev" alt="SourceRev">
+        </a>
+    </div>
+    <div class="nexmoe-count">
+        <div><span>文章</span>13</div>
+        <div><span>标签</span>12</div>
+        <div><span>分类</span>4</div>
+    </div>
+    <div class="nexmoe-list mdui-list" mdui-collapse="{accordion: true}">
+        
+        <a class="nexmoe-list-item mdui-list-item mdui-ripple false" href="/" title="回到首页">
+            <i class="mdui-list-item-icon nexmoefont icon-home"></i>
+            <div class="mdui-list-item-content">
+                回到首页
+            </div>
+        </a>
+        
+        <a class="nexmoe-list-item mdui-list-item mdui-ripple false" href="/archive.html" title="文章归档">
+            <i class="mdui-list-item-icon nexmoefont icon-container"></i>
+            <div class="mdui-list-item-content">
+                文章归档
+            </div>
+        </a>
+        
+        <a class="nexmoe-list-item mdui-list-item mdui-ripple false" href="/PY.html" title="我的朋友">
+            <i class="mdui-list-item-icon nexmoefont icon-unorderedlist"></i>
+            <div class="mdui-list-item-content">
+                我的朋友
+            </div>
+        </a>
+        
+        <a class="nexmoe-list-item mdui-list-item mdui-ripple false" href="/about.html" title="关于博主">
+            <i class="mdui-list-item-icon nexmoefont icon-info-circle"></i>
+            <div class="mdui-list-item-content">
+                关于博主
+            </div>
+        </a>
+        
+    </div>
+    
+    
+        
+        <div class="nexmoe-widget-wrap">
+    <div class="nexmoe-widget nexmoe-search">
+         
+            <form id="search_form" action_e="https://cn.bing.com/search?q=site:nexmoe.com" onsubmit="return search();">
+                <label><input id="search_value" name="q" type="search" placeholder="搜索"></label>
+            </form>
+         
+    </div>
+</div>
+
+
+
+
+    
+        
+        <div class="nexmoe-widget-wrap">
+	<div class="nexmoe-widget nexmoe-social">
+		<a
+			class="mdui-ripple"
+			href="https://jq.qq.com/?_wv=1027&k=5CfKHun"
+			target="_blank"
+			mdui-tooltip="{content: 'QQ群'}"
+			style="
+				color: rgb(249, 174, 8);
+				background-color: rgba(249, 174, 8, .1);
+			"
+		>
+			<i
+				class="nexmoefont icon-QQ"
+			></i> </a
+		><a
+			class="mdui-ripple"
+			href="https://github.com/nexmoe/"
+			target="_blank"
+			mdui-tooltip="{content: 'GitHub'}"
+			style="
+				color: rgb(25, 23, 23);
+				background-color: rgba(25, 23, 23, .1);
+			"
+		>
+			<i
+				class="nexmoefont icon-github"
+			></i> </a
+		>
+	</div>
+</div>
+
+    
+        
+        
+  <div class="nexmoe-widget-wrap">
+    <h3 class="nexmoe-widget-title">文章分类</h3>
+    <div class="nexmoe-widget">
+
+      <ul class="category-list">
+
+        
+
+
+        
+
+        
+
+        <li class="category-list-item">
+          <a class="category-list-link" href="/categories/ACM/">ACM</a>
+          <span class="category-list-count">1</span>
+        </li>
+
+        
+
+        <li class="category-list-item">
+          <a class="category-list-link" href="/categories/CTF/">CTF</a>
+          <span class="category-list-count">7</span>
+        </li>
+
+        
+
+        <li class="category-list-item">
+          <a class="category-list-link" href="/categories/开发/">开发</a>
+          <span class="category-list-count">1</span>
+        </li>
+
+        
+
+        <li class="category-list-item">
+          <a class="category-list-link" href="/categories/机器学习/">机器学习</a>
+          <span class="category-list-count">1</span>
+        </li>
+
+        
+      </ul>
+
+    </div>
+  </div>
+
+
+    
+        
+        
+  <div class="nexmoe-widget-wrap">
+    <div id="randomtagcloud" class="nexmoe-widget tagcloud nexmoe-rainbow">
+      <a href="/tags/DP/" style="font-size: 10px;">DP</a> <a href="/tags/Laravel/" style="font-size: 10px;">Laravel</a> <a href="/tags/MySQL/" style="font-size: 10px;">MySQL</a> <a href="/tags/SSRF/" style="font-size: 10px;">SSRF</a> <a href="/tags/SSTI/" style="font-size: 10px;">SSTI</a> <a href="/tags/Yii%E6%A8%A1%E6%9D%BF/" style="font-size: 10px;">Yii模板</a> <a href="/tags/pickle/" style="font-size: 10px;">pickle</a> <a href="/tags/pwn/" style="font-size: 10px;">pwn</a> <a href="/tags/web/" style="font-size: 20px;">web</a> <a href="/tags/%E5%8F%8D%E5%BA%8F%E5%88%97%E5%8C%96/" style="font-size: 15px;">反序列化</a> <a href="/tags/%E7%A5%9E%E7%BB%8F%E7%BD%91%E7%BB%9C/" style="font-size: 10px;">神经网络</a> <a href="/tags/%E7%AE%97%E6%B3%95/" style="font-size: 10px;">算法</a>
+    </div>
+    
+      <script>
+        var maxTagcloud = parseInt(17);
+        var tags_length = parseInt(12);
+        var tags_arr = [];
+        for(var i = 0; i < tags_length; i++){
+          tags_arr.push(i);
+        }
+        tags_arr.sort(function (l, r) {
+          return Math.random() > 0.5 ? -1 : 1;
+        });
+        tags_arr = tags_arr.slice(0, maxTagcloud < tags_length ? tags_length - maxTagcloud : 0);
+        for(var tag_i = 0; tag_i < tags_arr.length; tag_i++){
+          document.getElementById("randomtagcloud").children[tags_arr[tag_i]].style.display = 'none';
+        }
+      </script>
+    
+  </div>
+
+    
+        
+        
+        
+  <div class="nexmoe-widget-wrap">
+    <h3 class="nexmoe-widget-title">文章归档</h3>
+    <div class="nexmoe-widget">
+      <ul class="archive-list"><li class="archive-list-item"><a class="archive-list-link" href="/archives/2023/">2023</a><span class="archive-list-count">2</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2022/">2022</a><span class="archive-list-count">11</span></li></ul>
+    </div>
+  </div>
+
+
+
+    
+        
+        
+  <div class="nexmoe-widget-wrap">
+    <h3 class="nexmoe-widget-title">最新文章</h3>
+    <div class="nexmoe-widget">
+      <ul>
+        
+          <li>
+            <a href="/2023/02/02/SSTI1/">缓冲区溢出</a>
+          </li>
+        
+          <li>
+            <a href="/2023/01/09/SSRF1/">SSRF</a>
+          </li>
+        
+          <li>
+            <a href="/2022/12/21/pwn_overflow/">缓冲区溢出</a>
+          </li>
+        
+          <li>
+            <a href="/2022/11/16/deeplearning/">深度学习基础</a>
+          </li>
+        
+          <li>
+            <a href="/2022/11/11/algorithm_dp/">DP模板</a>
+          </li>
+        
+      </ul>
+    </div>
+  </div>
+
+    
+        
+        <div class="nexmoe-widget-wrap">
+    <div class="nexmoe-widget nexmoe-link">
+		<ul>
+        
+		</ul>
+    </div>
+</div>
+<style>
+.nexmoe-widget-wrap .nexmoe-link ul li a {
+    text-align : center;
+}
+.nexmoe-widget-wrap .nexmoe-link ul li a img {
+    max-width : 100%;
+}
+.nexmoe-widget-wrap .nexmoe-link ul li a p {
+    margin: 10px 0;
+}
+</style>
+
+    
+   
+    <div class="nexmoe-copyright">
+        &copy; 2023 SourceRev
+        Powered by <a href="http://hexo.io/" target="_blank">Hexo</a>
+        & <a href="https://github.com/theme-nexmoe/hexo-theme-nexmoe" target="_blank">Nexmoe</a>
+        <br><a> </a>
+
+    </div>
+</div><!-- .nexmoe-drawer --></div><div id="nexmoe-content"><div class="nexmoe-primary"><div class="nexmoe-post">
+  <article>
+    
+        <div class="nexmoe-post-cover absolute" style="padding-top: 62.5%;"> 
+            <img src="/img/3.png" alt="深度学习基础" loading="lazy">
+            <h1>深度学习基础</h1>
+        </div>
+    
+    
+    <div class="nexmoe-post-meta">
+    <div class="nexmoe-rainbow">
+        <a class="nexmoefont icon-calendar-fill">2022年11月16日</a>
+        
+            <a class="nexmoefont icon-appstore-fill -link" href="/categories/%E6%9C%BA%E5%99%A8%E5%AD%A6%E4%B9%A0/">机器学习</a>
+        
+        
+    <a><i class="nexmoefont icon-areachart"></i>约2.4k字</a>
+    <a><i class="nexmoefont icon-time-circle-fill"></i>预计需要9分钟</a>
+
+    </div>
+    
+    
+    
+    
+    
+</div>
+
+    <h1 id="感知机"><a href="#感知机" class="headerlink" title="感知机"></a>感知机</h1><p>定义：感知机接收多个输入信号，输出一个信号。</p>
+<blockquote>
+<p>$x_1$、$x_2$是输入信号， $y$是输出信号，$w_1$、$w_2$是权重。输入信号被送往神经元时，会被分别乘以固定的权重$(w_1x_1、w_2x_2)$。</p>
+<p>神经元会计算传送过来的信号的总和，只有当这个总和超过 了某个界限值时，才会输出1。这也称为“神经元被激活”。这里将这个界限值称为阈值，用符号$θ$表示。</p>
+</blockquote>
+<p>数学表示</p>
+<p><img onerror="imgOnError(this);" data-fancybox="gallery" src="/avatar/dpl-1.jpg" alt="式一" data-caption="式一" loading="lazy"></p>
+<p>感知机的多个输入信号都有各自固有的权重，这些权重发挥着控制各个 信号的重要性的作用。也就是说，<strong>权重越大，对应该权重的信号的重要性就越高</strong>。</p>
+<p>简单实现感知机（门的实现）</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">def</span> <span class="title function_">AND</span>(<span class="params">x1, x2</span>):</span><br><span class="line">    w1, w2, theta = <span class="number">0.5</span>, <span class="number">0.5</span>, <span class="number">0.7</span></span><br><span class="line">    tmp = x1*w1 + x2*w2</span><br><span class="line">    <span class="keyword">if</span> tmp &lt;= theta:</span><br><span class="line">        <span class="keyword">return</span> <span class="number">0</span></span><br><span class="line">    <span class="keyword">else</span>:</span><br><span class="line">        <span class="keyword">return</span> <span class="number">1</span></span><br></pre></td></tr></table></figure>
+
+<h2 id="导入权重与偏置"><a href="#导入权重与偏置" class="headerlink" title="导入权重与偏置"></a>导入权重与偏置</h2><p>首先把上面式子的$θ$换成$−b$，于 是就可以用新的式子来表示感知机的行为。</p>
+<p><img onerror="imgOnError(this);" data-fancybox="gallery" src="/avatar/dpl-2.jpg" alt="式二" data-caption="式二" loading="lazy"></p>
+<p>式子中虽然有一个符号不同，但表达的内容是完全相同的。 此处，$b$称为偏置，$w_1$和$w_2$称为权重。感知机会计算输入信号和权重的乘积，然后加上偏置，如果这个值大于0则输出1，否则输出0。</p>
+<p>门的实现</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br></pre></td><td class="code"><pre><span class="line"><span class="string">&#x27;&#x27;&#x27;</span></span><br><span class="line"><span class="string">代码实现的是与门，非门（NAND）和或门（OR）只需要将权重与偏置量进行变化即可</span></span><br><span class="line"><span class="string">&#x27;&#x27;&#x27;</span></span><br><span class="line"><span class="keyword">def</span> <span class="title function_">AND</span>(<span class="params">x1, x2</span>):</span><br><span class="line">    x = np.array([x1, x2])</span><br><span class="line">    w = np.array([<span class="number">0.5</span>, <span class="number">0.5</span>])</span><br><span class="line">    b = -<span class="number">0.7</span></span><br><span class="line">    <span class="comment"># w = np.array([-0.5, -0.5]) # 非门</span></span><br><span class="line"> 	<span class="comment"># b = 0.7				     # 非门</span></span><br><span class="line">    <span class="comment"># w = np.array([0.5, 0.5]) # 非门</span></span><br><span class="line"> 	<span class="comment"># b = -0.2				     # 非门</span></span><br><span class="line">    tmp = np.<span class="built_in">sum</span>(w*x) + b</span><br><span class="line">    <span class="keyword">if</span> tmp &lt;= <span class="number">0</span>:</span><br><span class="line">        <span class="keyword">return</span> <span class="number">0</span></span><br><span class="line">    <span class="keyword">else</span>:</span><br><span class="line">        <span class="keyword">return</span> <span class="number">1</span></span><br><span class="line"><span class="string">&#x27;&#x27;&#x27;</span></span><br><span class="line"><span class="string">异或门实现</span></span><br><span class="line"><span class="string">&#x27;&#x27;&#x27;</span></span><br><span class="line"><span class="keyword">def</span> <span class="title function_">XOR</span>(<span class="params">x1, x2</span>):</span><br><span class="line">    s1 = NAND(x1, x2)</span><br><span class="line">    s2 = OR(x1, x2)</span><br><span class="line">    y = AND(s1, s2)</span><br><span class="line">    <span class="keyword">return</span> y</span><br></pre></td></tr></table></figure>
+
+<h1 id="神经网络"><a href="#神经网络" class="headerlink" title="神经网络"></a>神经网络</h1><p>我们现在将式子改写成更加简洁的形式</p>
+<p><img onerror="imgOnError(this);" data-fancybox="gallery" src="/avatar/dpl-3.jpg" alt="式三" data-caption="式三" loading="lazy"></p>
+<p>输入信号的总和会被函数$h(x)$转换，转换后的值就是输出y。 然后，式子所表示的函数$h(x)$，在输入超过0时返回1，否则返回0。</p>
+<h2 id="激活函数"><a href="#激活函数" class="headerlink" title="激活函数"></a>激活函数</h2><p>刚才登场的$h(x)$函数会将输入信号的总和转换为输出信号，这些函数就被称为激活函数。激活函数的作用在于决定如何来激活输入信号的总和。</p>
+<h3 id="sigmoid函数"><a href="#sigmoid函数" class="headerlink" title="sigmoid函数"></a>sigmoid函数</h3><p><img onerror="imgOnError(this);" data-fancybox="gallery" src="/avatar/dpl-4.jpg" alt="式四" data-caption="式四" loading="lazy"></p>
+<p>其中的exp(−x)表示e^{−x}的意思</p>
+<p>神经网络中用sigmoid函数作为激活函数，进行信号的转换，转换后的信号被传送给下一个神经元。</p>
+<p>函数实现</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">def</span> <span class="title function_">sigmoid</span>(<span class="params">x</span>):</span><br><span class="line">    <span class="keyword">return</span> <span class="number">1</span> / (<span class="number">1</span> + np.exp(-x))</span><br></pre></td></tr></table></figure>
+
+<p>图像表示</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">x = np.arange(-<span class="number">5.0</span>, <span class="number">5.0</span>, <span class="number">0.1</span>)</span><br><span class="line">y = sigmoid(x)</span><br><span class="line">plt.plot(x, y)</span><br><span class="line">plt.ylim(-<span class="number">0.1</span>, <span class="number">1.1</span>) <span class="comment"># 指定y轴的范围</span></span><br><span class="line">plt.show()</span><br></pre></td></tr></table></figure>
+
+<h3 id="阶跃函数"><a href="#阶跃函数" class="headerlink" title="阶跃函数"></a>阶跃函数</h3><p>阶跃函数如式3所示，当输入超过0时，输出1， 否则输出0。</p>
+<p>Python实现</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># 只支持实数范围内的数据</span></span><br><span class="line"><span class="keyword">def</span> <span class="title function_">step_function</span>(<span class="params">x</span>):</span><br><span class="line">    <span class="keyword">if</span> x &gt; <span class="number">0</span>:</span><br><span class="line">        <span class="keyword">return</span> <span class="number">1</span></span><br><span class="line">    <span class="keyword">else</span>:</span><br><span class="line">        <span class="keyword">return</span> <span class="number">0</span></span><br><span class="line">    </span><br><span class="line"><span class="comment"># 支持numpy的函数</span></span><br><span class="line"><span class="keyword">def</span> <span class="title function_">step_function</span>(<span class="params">x</span>):</span><br><span class="line">    y = x &gt; <span class="number">0</span> <span class="comment"># y的结果是一个储存比较结果的布尔数组</span></span><br><span class="line">    <span class="keyword">return</span> y.astype(np.<span class="built_in">int</span>)</span><br></pre></td></tr></table></figure>
+
+<p>图像表示</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> numpy <span class="keyword">as</span> np</span><br><span class="line"><span class="keyword">import</span> matplotlib.pylab <span class="keyword">as</span> plt</span><br><span class="line"><span class="keyword">def</span> <span class="title function_">step_function</span>(<span class="params">x</span>):</span><br><span class="line">    <span class="keyword">return</span> np.array(x &gt; <span class="number">0</span>, dtype=np.<span class="built_in">int</span>)</span><br><span class="line">x = np.arange(-<span class="number">5.0</span>, <span class="number">5.0</span>, <span class="number">0.1</span>)</span><br><span class="line">y = step_function(x)</span><br><span class="line">plt.plot(x, y)</span><br><span class="line">plt.ylim(-<span class="number">0.1</span>, <span class="number">1.1</span>) <span class="comment"># 指定y轴的范围</span></span><br><span class="line">plt.show()</span><br></pre></td></tr></table></figure>
+
+<h4 id="两种激活函数比较"><a href="#两种激活函数比较" class="headerlink" title="两种激活函数比较"></a>两种激活函数比较</h4><p>不同点</p>
+<table>
+<thead>
+<tr>
+<th align="center">函数名称</th>
+<th align="center">图像呈现方式</th>
+<th align="center">变化节点</th>
+<th align="center">返回值</th>
+</tr>
+</thead>
+<tbody><tr>
+<td align="center">sigmoid</td>
+<td align="center">平滑的曲线</td>
+<td align="center">随着输入发生连续性的变化</td>
+<td align="center">实数</td>
+</tr>
+<tr>
+<td align="center">阶跃函数</td>
+<td align="center">由直线构成</td>
+<td align="center">以0为界，输出发生急剧变化</td>
+<td align="center">0和1二元信号</td>
+</tr>
+</tbody></table>
+<p>共同点</p>
+<p>输入值越大越接近1，越小越接近0。而为了发挥叠加层所带来的优势，<strong>激活函数必须使用非线性函数</strong>。</p>
+<h3 id="ReLU函数"><a href="#ReLU函数" class="headerlink" title="ReLU函数"></a>ReLU函数</h3><p><img onerror="imgOnError(this);" data-fancybox="gallery" src="/avatar/dpl-5.jpg" alt="式五" data-caption="式五" loading="lazy"></p>
+<p>实现</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">def</span> <span class="title function_">relu</span>(<span class="params">x</span>):</span><br><span class="line"> 	<span class="keyword">return</span> np.maximum(<span class="number">0</span>, x)</span><br><span class="line"><span class="comment"># maximum函数会从输入的数值中选择较大的那个值进行输出</span></span><br></pre></td></tr></table></figure>
+
+<h2 id="三层神经网络的实现"><a href="#三层神经网络的实现" class="headerlink" title="三层神经网络的实现"></a>三层神经网络的实现</h2><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">def</span> <span class="title function_">init_network</span>():</span><br><span class="line">    network = &#123;&#125;</span><br><span class="line">    network[<span class="string">&#x27;W1&#x27;</span>] = np.array([[<span class="number">0.1</span>, <span class="number">0.3</span>, <span class="number">0.5</span>], [<span class="number">0.2</span>, <span class="number">0.4</span>, <span class="number">0.6</span>]])</span><br><span class="line">    network[<span class="string">&#x27;b1&#x27;</span>] = np.array([<span class="number">0.1</span>, <span class="number">0.2</span>, <span class="number">0.3</span>])</span><br><span class="line">    network[<span class="string">&#x27;W2&#x27;</span>] = np.array([[<span class="number">0.1</span>, <span class="number">0.4</span>], [<span class="number">0.2</span>, <span class="number">0.5</span>], [<span class="number">0.3</span>, <span class="number">0.6</span>]])</span><br><span class="line">    network[<span class="string">&#x27;b2&#x27;</span>] = np.array([<span class="number">0.1</span>, <span class="number">0.2</span>])</span><br><span class="line">    network[<span class="string">&#x27;W3&#x27;</span>] = np.array([[<span class="number">0.1</span>, <span class="number">0.3</span>], [<span class="number">0.2</span>, <span class="number">0.4</span>]])</span><br><span class="line">    network[<span class="string">&#x27;b3&#x27;</span>] = np.array([<span class="number">0.1</span>, <span class="number">0.2</span>])</span><br><span class="line"> 	<span class="keyword">return</span> network</span><br><span class="line"></span><br><span class="line"><span class="keyword">def</span> <span class="title function_">forward</span>(<span class="params">network, x</span>):</span><br><span class="line">    W1, W2, W3 = network[<span class="string">&#x27;W1&#x27;</span>], network[<span class="string">&#x27;W2&#x27;</span>], network[<span class="string">&#x27;W3&#x27;</span>]</span><br><span class="line">    b1, b2, b3 = network[<span class="string">&#x27;b1&#x27;</span>], network[<span class="string">&#x27;b2&#x27;</span>], network[<span class="string">&#x27;b3&#x27;</span>]</span><br><span class="line">    a1 = np.dot(x, W1) + b1</span><br><span class="line">    z1 = sigmoid(a1)</span><br><span class="line">    a2 = np.dot(z1, W2) + b2</span><br><span class="line">    z2 = sigmoid(a2)</span><br><span class="line">    a3 = np.dot(z2, W3) + b3</span><br><span class="line">    y = identity_function(a3)</span><br><span class="line">    <span class="keyword">return</span> y</span><br><span class="line"></span><br><span class="line">network = init_network()</span><br><span class="line">x = np.array([<span class="number">1.0</span>, <span class="number">0.5</span>])</span><br><span class="line">y = forward(network, x)</span><br><span class="line"><span class="built_in">print</span>(y) <span class="comment"># [0.31682708 0.69627909]</span></span><br></pre></td></tr></table></figure>
+
+<p>这里定义了 <code>init_network()</code> 和 <code>forward()</code> 函数。<code>init_network()</code> 函数会进行权重和偏置的初始化，并将它们保存在字典变量 <code>network</code> 中。这个字典变量 <code>network</code> 中保存了每一层所需的参数（权重和偏置）。<code>forward()</code> 函数中则封 装了将输入信号转换为输出信号的处理过程。</p>
+<p>机器学习的问题大致可以分为分类问题和回归问题</p>
+<ul>
+<li>分类问题：数据属于哪一个类别的问题，比如：判断男生还是女生的问题</li>
+<li>回归问题：根据某个输入预测一个数值，比如：根据一个人的图像预测这个人的体重</li>
+</ul>
+<h2 id="恒等函数和softmax函数"><a href="#恒等函数和softmax函数" class="headerlink" title="恒等函数和softmax函数"></a>恒等函数和softmax函数</h2><p>恒等函数会将输入按原样输出，对于输入的信息，不加以任何改动地直接输出。</p>
+<p>softmax函数：</p>
+<p><img onerror="imgOnError(this);" data-fancybox="gallery" src="/avatar/dpl-6.jpg" alt="式六" data-caption="式六" loading="lazy"></p>
+<p>表示假设输出层共有$n$个神经元，计算第$k$个神经元的输出$y_k$</p>
+<p>函数实现</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">def</span> <span class="title function_">softmax</span>(<span class="params">a</span>):</span><br><span class="line">    exp_a = np.exp(a)</span><br><span class="line">    sum_exp_a = np.<span class="built_in">sum</span>(exp_a)</span><br><span class="line">    y = exp_a / sum_exp_a</span><br><span class="line">    <span class="keyword">return</span> y</span><br></pre></td></tr></table></figure>
+
+<p>softmax函数的改进</p>
+<p><img onerror="imgOnError(this);" data-fancybox="gallery" src="/avatar/dpl-7.jpg" alt="式七" data-caption="式七" loading="lazy"></p>
+<p>式7说明，在进行softmax的指数函数的运算时，加上（或者减去） 某个常数并不会改变运算的结果。这里的$C’ $可以使用任何值，但是为了防止溢出，一般会使用输入信号中的最大值。</p>
+<p>改进型softmax</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">def</span> <span class="title function_">softmax</span>(<span class="params">a</span>):</span><br><span class="line">    c = np.<span class="built_in">max</span>(a)</span><br><span class="line">    exp_a = np.exp(a - c) <span class="comment"># 溢出对策</span></span><br><span class="line">    sum_exp_a = np.<span class="built_in">sum</span>(exp_a)</span><br><span class="line">    y = exp_a / sum_exp_a</span><br><span class="line">    <span class="keyword">return</span> y</span><br></pre></td></tr></table></figure>
+
+<p>softmax函数的输出是0.0到1.0之间的实数。并且，softmax 函数的输出值的总和是1。输出总和为1是softmax函数的一个重要性质。所以，输出结果才能被解释为“概率”。</p>
+<p><strong>特征量</strong>：是指可以从输入数据（输入图像）中准确地提取本质数据（重要的数据）的转换器。图像的特征量通常表示为向量的形式。</p>
+<p><strong>过拟合</strong>：可以顺利地处理某个数据集，但无法处理其他数据集的情况</p>
+<h2 id="损失函数"><a href="#损失函数" class="headerlink" title="损失函数"></a>损失函数</h2><p>神经网络以某个指标为线索寻找最优权重参数。神经网络的学习中所用的指标称为<strong>损失函数</strong>。这个损失函数可以使用任意函数， 但一般用均方误差和交叉熵误差等</p>
+<h3 id="均方误差"><a href="#均方误差" class="headerlink" title="均方误差"></a>均方误差</h3><p><img onerror="imgOnError(this);" data-fancybox="gallery" src="/avatar/dpl-8.jpg" alt="式八" data-caption="式八" loading="lazy"></p>
+<p>这里，yk是表示神经网络的输出，t_k表示监督数据，k表示数据的维数。</p>
+<p>实现</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">def</span> <span class="title function_">mean_squared_error</span>(<span class="params">y, t</span>):</span><br><span class="line">    <span class="keyword">return</span> <span class="number">0.5</span> * np.<span class="built_in">sum</span>((y-t)**<span class="number">2</span>)</span><br><span class="line"><span class="comment"># y是softmax函数的输出，t是监督数据</span></span><br></pre></td></tr></table></figure>
+
+<h3 id="交叉熵误差"><a href="#交叉熵误差" class="headerlink" title="交叉熵误差"></a>交叉熵误差</h3><p><img onerror="imgOnError(this);" data-fancybox="gallery" src="/avatar/dpl-9.jpg" alt="式九" data-caption="式九" loading="lazy"></p>
+<p>正确解标签对应的输出越大，式9的值越接近0；当输出为1时，交叉熵误差为0。</p>
+<p>实现</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">def</span> <span class="title function_">cross_entropy_error</span>(<span class="params">y, t</span>):</span><br><span class="line">    delta = <span class="number">1e-7</span></span><br><span class="line">    <span class="keyword">return</span> -np.<span class="built_in">sum</span>(t * np.log(y + delta))</span><br></pre></td></tr></table></figure>
+
+<p>上述代码加上了一 个微小值delta，这是因为当出现 <code>np.log(0)</code> 时，<code>np.log(0)</code> 会变为负无限大的 <code>-inf</code>，这样一来就会导致后续计算无法进行。</p>
+<h4 id="Mini-batch实现交叉熵误差"><a href="#Mini-batch实现交叉熵误差" class="headerlink" title="Mini-batch实现交叉熵误差"></a>Mini-batch实现交叉熵误差</h4><p>如果遇到大数据， 数据量会有几百万、几千万之多，这种情况下以全部数据为对象计算损失函数是不现实的。因此，我们从全部数据中选出一部分，作为全部数据的“近似”。这种学习方式称为<strong>mini-batch学习</strong>。</p>
+<p>实现</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># one-hot形式：将正确解标签表示为1，其他标签表示为0的表示方法</span></span><br><span class="line"><span class="keyword">def</span> <span class="title function_">cross_entropy_error</span>(<span class="params">y, t</span>):</span><br><span class="line">    <span class="keyword">if</span> y.ndim == <span class="number">1</span>:</span><br><span class="line">        t = t.reshape(<span class="number">1</span>, t.size)</span><br><span class="line">        y = y.reshape(<span class="number">1</span>, y.size)</span><br><span class="line">        batch_size = y.shape[<span class="number">0</span>]</span><br><span class="line">        <span class="keyword">return</span> -np.<span class="built_in">sum</span>(t * np.log(y + <span class="number">1e-7</span>)) / batch_size</span><br><span class="line"><span class="comment"># 标签形式：像“2”“7”这样的标签</span></span><br><span class="line"><span class="keyword">def</span> <span class="title function_">cross_entropy_error</span>(<span class="params">y, t</span>):</span><br><span class="line">    <span class="keyword">if</span> y.ndim == <span class="number">1</span>:</span><br><span class="line">        t = t.reshape(<span class="number">1</span>, t.size)</span><br><span class="line">        y = y.reshape(<span class="number">1</span>, y.size)</span><br><span class="line">        batch_size = y.shape[<span class="number">0</span>]</span><br><span class="line">        <span class="keyword">return</span> -np.<span class="built_in">sum</span>(np.log(y[np.arange(batch_size), t] + <span class="number">1e-7</span>)) / batch_size</span><br></pre></td></tr></table></figure>
+
+<h2 id="反向传播"><a href="#反向传播" class="headerlink" title="反向传播"></a>反向传播</h2><p>“从左向右进行计算”是一种正方向上的传播，简称为<strong>正向传播</strong>。正向传播是从计算图出发点到结束点的传播。 既然有正向传播这个名称，当然也可以考虑反向（从图上看的话，就是从右向左）的传播。实际上，这种传播称为<strong>反向传播</strong>，反向传播将在接下来的导数计算中发挥重要作用。</p>
+<p><img onerror="imgOnError(this);" data-fancybox="gallery" src="/avatar/dpl-11.jpg" alt="反向传播" data-caption="反向传播" loading="lazy"></p>
+<p>如上图，反向传播从右向左传递导数的值（1 → 1.1 → 2.2）。从这个结果中可知，“支付金额关于苹果的价格的导数”的值是2.2。</p>
+<p>加法层原封不动还给下游，而乘法层交叉相乘</p>
+<h3 id="ReLU层激活函数实现反向传播"><a href="#ReLU层激活函数实现反向传播" class="headerlink" title="ReLU层激活函数实现反向传播"></a>ReLU层激活函数实现反向传播</h3><p><img onerror="imgOnError(this);" data-fancybox="gallery" src="/avatar/dpl-10.jpg" alt="式十" data-caption="式十" loading="lazy"></p>
+<p>在式10中，如果正向传播时的输入x大于0，则反向传播会将上游的值原封不动地传给下游。反过来，如果正向传播时的x小于等于0，则反向传播中传给下游的信号将停在此处。</p>
+
+    <p><img src="" loading="lazy"></p>
+
+  </article>
+
+  
+      
+    <div class="nexmoe-post-copyright">
+        <strong>本文作者：</strong>SourceRev<br>
+        <strong>本文链接：</strong><a href="http://sourcerev.github.io/2022/11/16/deeplearning/" title="http:&#x2F;&#x2F;sourcerev.github.io&#x2F;2022&#x2F;11&#x2F;16&#x2F;deeplearning&#x2F;" target="_blank" rel="noopener">http:&#x2F;&#x2F;sourcerev.github.io&#x2F;2022&#x2F;11&#x2F;16&#x2F;deeplearning&#x2F;</a><br>
+        
+            <strong>版权声明：</strong>本文采用 <a href="https://creativecommons.org/licenses/by-nc-sa/3.0/cn/deed.zh" target="_blank">CC BY-NC-SA 3.0 CN</a> 协议进行许可
+
+        
+    </div>
+
+
+  
+  
+  <div class="nexmoe-post-meta nexmoe-rainbow">
+   
+    
+        <a class="nexmoefont icon-tag-fill -none-link" href="/tags/%E7%A5%9E%E7%BB%8F%E7%BD%91%E7%BB%9C/" rel="tag">神经网络</a> <a class="nexmoefont icon-tag-fill -none-link" href="/tags/%E7%AE%97%E6%B3%95/" rel="tag">算法</a>
+    
+</div>
+  
+  
+    <script async src="/js/copy-codeblock.js?v=1681305066658"></script>
+  
+
+  
+      <div class="nexmoe-post-footer">
+          <br><a>这是一个假的评论区</a>
+
+      </div>
+  
+</div></div><div class="nexmoe-post-right">    <div class="nexmoe-fixed">
+        <div class="nexmoe-tool">
+
+            
+
+            
+            
+            <button class="mdui-fab catalog" style="overflow:unset;">
+                <i class="nexmoefont icon-i-catalog"></i>
+                <div class="nexmoe-toc">
+                    <ol class="toc"><li class="toc-item toc-level-1"><a class="toc-link" href="#%E6%84%9F%E7%9F%A5%E6%9C%BA"><span class="toc-number">1.</span> <span class="toc-text">感知机</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#%E5%AF%BC%E5%85%A5%E6%9D%83%E9%87%8D%E4%B8%8E%E5%81%8F%E7%BD%AE"><span class="toc-number">1.1.</span> <span class="toc-text">导入权重与偏置</span></a></li></ol></li><li class="toc-item toc-level-1"><a class="toc-link" href="#%E7%A5%9E%E7%BB%8F%E7%BD%91%E7%BB%9C"><span class="toc-number">2.</span> <span class="toc-text">神经网络</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#%E6%BF%80%E6%B4%BB%E5%87%BD%E6%95%B0"><span class="toc-number">2.1.</span> <span class="toc-text">激活函数</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#sigmoid%E5%87%BD%E6%95%B0"><span class="toc-number">2.1.1.</span> <span class="toc-text">sigmoid函数</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E9%98%B6%E8%B7%83%E5%87%BD%E6%95%B0"><span class="toc-number">2.1.2.</span> <span class="toc-text">阶跃函数</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#%E4%B8%A4%E7%A7%8D%E6%BF%80%E6%B4%BB%E5%87%BD%E6%95%B0%E6%AF%94%E8%BE%83"><span class="toc-number">2.1.2.1.</span> <span class="toc-text">两种激活函数比较</span></a></li></ol></li><li class="toc-item toc-level-3"><a class="toc-link" href="#ReLU%E5%87%BD%E6%95%B0"><span class="toc-number">2.1.3.</span> <span class="toc-text">ReLU函数</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E4%B8%89%E5%B1%82%E7%A5%9E%E7%BB%8F%E7%BD%91%E7%BB%9C%E7%9A%84%E5%AE%9E%E7%8E%B0"><span class="toc-number">2.2.</span> <span class="toc-text">三层神经网络的实现</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E6%81%92%E7%AD%89%E5%87%BD%E6%95%B0%E5%92%8Csoftmax%E5%87%BD%E6%95%B0"><span class="toc-number">2.3.</span> <span class="toc-text">恒等函数和softmax函数</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E6%8D%9F%E5%A4%B1%E5%87%BD%E6%95%B0"><span class="toc-number">2.4.</span> <span class="toc-text">损失函数</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#%E5%9D%87%E6%96%B9%E8%AF%AF%E5%B7%AE"><span class="toc-number">2.4.1.</span> <span class="toc-text">均方误差</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E4%BA%A4%E5%8F%89%E7%86%B5%E8%AF%AF%E5%B7%AE"><span class="toc-number">2.4.2.</span> <span class="toc-text">交叉熵误差</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#Mini-batch%E5%AE%9E%E7%8E%B0%E4%BA%A4%E5%8F%89%E7%86%B5%E8%AF%AF%E5%B7%AE"><span class="toc-number">2.4.2.1.</span> <span class="toc-text">Mini-batch实现交叉熵误差</span></a></li></ol></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E5%8F%8D%E5%90%91%E4%BC%A0%E6%92%AD"><span class="toc-number">2.5.</span> <span class="toc-text">反向传播</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#ReLU%E5%B1%82%E6%BF%80%E6%B4%BB%E5%87%BD%E6%95%B0%E5%AE%9E%E7%8E%B0%E5%8F%8D%E5%90%91%E4%BC%A0%E6%92%AD"><span class="toc-number">2.5.1.</span> <span class="toc-text">ReLU层激活函数实现反向传播</span></a></li></ol></li></ol></li></ol>
+                </div>
+            </button>
+            
+
+            
+
+            <a href="#nexmoe-content" class="toc-link" aria-label="Back To Top" title="top"><button class="mdui-fab mdui-ripple"><i class="nexmoefont icon-caret-top"></i></button></a>
+        </div>
+    </div>
+</div></div><div id="nexmoe-footer"><!--!--></div><div><div id="nexmoe-search-space">
+	<div class="search-container">
+		<div class="search-header">
+			<div class="search-input-container">
+				<input
+					class="search-input"
+					type="text"
+					placeholder="搜索"
+					oninput="sinput();"
+				/>
+			</div>
+			<a class="search-close" onclick="sclose();">×</a>
+		</div>
+		<div class="search-body"></div>
+	</div>
+</div>
+</div><div><script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-2058306854838448" crossorigin="anonymous"></script>
+</div></body></html>

@@ -1,0 +1,419 @@
+<!doctype html>
+<html lang="zh"><head>
+<title>缓冲区溢出 - Ciallo～(∠・ω&lt; )⌒★，欢迎来到SourceRev的个人博客</title>
+<meta charset="UTF-8">
+<meta name="keywords" content="">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=5">
+
+<link rel="shortcut icon" href="https://cravatar.cn/avatar/d4bd192ba44e2f9f35347b5123c7fa7e?s=400&amp;r=G&amp;d=mp&amp;ver=1681303077" type="image/jpg" />
+<meta name="description" content="PWN入门在CTF中，pwn主要是指通过程序本身的漏洞，编写利用脚本破解程序拿到系统的权限（shell），从而获得flag（通常为目标目录下文件内的一段随机字符串）这就要求我们对程序的各种函数，内存地址，堆栈空间，文件的结构有足够的了解。 缓冲区溢出基础知识GOT表Globle offset table 全局偏移量表，位于数据段，是一个每个条目是8字节地址的数组，用来存储外部函数在内存的确切地址，">
+<meta property="og:type" content="article">
+<meta property="og:title" content="缓冲区溢出">
+<meta property="og:url" content="http://sourcerev.github.io/2022/12/21/pwn_overflow/index.html">
+<meta property="og:site_name" content="Ciallo～(∠・ω&lt; )⌒★，欢迎来到SourceRev的个人博客">
+<meta property="og:description" content="PWN入门在CTF中，pwn主要是指通过程序本身的漏洞，编写利用脚本破解程序拿到系统的权限（shell），从而获得flag（通常为目标目录下文件内的一段随机字符串）这就要求我们对程序的各种函数，内存地址，堆栈空间，文件的结构有足够的了解。 缓冲区溢出基础知识GOT表Globle offset table 全局偏移量表，位于数据段，是一个每个条目是8字节地址的数组，用来存储外部函数在内存的确切地址，">
+<meta property="og:locale" content="zh_CN">
+<meta property="article:published_time" content="2022-12-20T18:23:56.000Z">
+<meta property="article:modified_time" content="2023-04-12T12:12:37.358Z">
+<meta property="article:author" content="SourceRev">
+<meta property="article:tag" content="pwn">
+<meta name="twitter:card" content="summary">
+
+<link rel="stylesheet" href="/lib/fancybox/fancybox.css">
+<link rel="stylesheet" href="/lib/mdui_043tiny/mdui.css">
+
+
+<link rel="stylesheet" href="/lib/iconfont/iconfont.css?v=1681305066778">
+
+<link rel="stylesheet" href="/css/style.css?v=1681305066778">
+
+
+
+
+
+<link rel="stylesheet" href="/custom.css?v=1681305066778">
+
+
+
+
+<script src="/lib/mdui_043tiny/mdui.js" async></script>
+<script src="/lib/fancybox/fancybox.umd.js" async></script>
+
+
+<script async src="/js/app.js?v=1681305066778"></script>
+
+
+
+<!-- Global site tag (gtag.js) - Google Analytics -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-4D4ZJ9G024"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag("js", new Date());
+
+  gtag("config", "G-4D4ZJ9G024");
+</script>
+<meta name="generator" content="Hexo 6.3.0"></head><body class="nexmoe mdui-drawer-body-left"><div id="nexmoe-background"><div class="nexmoe-bg" style="background-image: url(/img/44.png)"></div><div class="mdui-appbar mdui-shadow-0"><div class="mdui-toolbar"><a class="mdui-btn mdui-btn-icon mdui-ripple" mdui-drawer="{target: &#039;#drawer&#039;, swipe: true}" title="menu"><i class="mdui-icon nexmoefont icon-menu"></i></a><div class="mdui-toolbar-spacer"></div><a class="mdui-btn mdui-btn-icon" href="/" title="SourceRev"><img src="https://cravatar.cn/avatar/d4bd192ba44e2f9f35347b5123c7fa7e?s=400&amp;r=G&amp;d=mp&amp;ver=1681303077" alt="SourceRev"></a></div></div></div><div id="nexmoe-header"><div class="nexmoe-drawer mdui-drawer" id="drawer">
+    <div class="nexmoe-avatar mdui-ripple">
+        <a href="/" title="SourceRev">
+            <img src="https://cravatar.cn/avatar/d4bd192ba44e2f9f35347b5123c7fa7e?s=400&amp;r=G&amp;d=mp&amp;ver=1681303077" alt="SourceRev" alt="SourceRev">
+        </a>
+    </div>
+    <div class="nexmoe-count">
+        <div><span>文章</span>13</div>
+        <div><span>标签</span>12</div>
+        <div><span>分类</span>4</div>
+    </div>
+    <div class="nexmoe-list mdui-list" mdui-collapse="{accordion: true}">
+        
+        <a class="nexmoe-list-item mdui-list-item mdui-ripple false" href="/" title="回到首页">
+            <i class="mdui-list-item-icon nexmoefont icon-home"></i>
+            <div class="mdui-list-item-content">
+                回到首页
+            </div>
+        </a>
+        
+        <a class="nexmoe-list-item mdui-list-item mdui-ripple false" href="/archive.html" title="文章归档">
+            <i class="mdui-list-item-icon nexmoefont icon-container"></i>
+            <div class="mdui-list-item-content">
+                文章归档
+            </div>
+        </a>
+        
+        <a class="nexmoe-list-item mdui-list-item mdui-ripple false" href="/PY.html" title="我的朋友">
+            <i class="mdui-list-item-icon nexmoefont icon-unorderedlist"></i>
+            <div class="mdui-list-item-content">
+                我的朋友
+            </div>
+        </a>
+        
+        <a class="nexmoe-list-item mdui-list-item mdui-ripple false" href="/about.html" title="关于博主">
+            <i class="mdui-list-item-icon nexmoefont icon-info-circle"></i>
+            <div class="mdui-list-item-content">
+                关于博主
+            </div>
+        </a>
+        
+    </div>
+    
+    
+        
+        <div class="nexmoe-widget-wrap">
+    <div class="nexmoe-widget nexmoe-search">
+         
+            <form id="search_form" action_e="https://cn.bing.com/search?q=site:nexmoe.com" onsubmit="return search();">
+                <label><input id="search_value" name="q" type="search" placeholder="搜索"></label>
+            </form>
+         
+    </div>
+</div>
+
+
+
+
+    
+        
+        <div class="nexmoe-widget-wrap">
+	<div class="nexmoe-widget nexmoe-social">
+		<a
+			class="mdui-ripple"
+			href="https://jq.qq.com/?_wv=1027&k=5CfKHun"
+			target="_blank"
+			mdui-tooltip="{content: 'QQ群'}"
+			style="
+				color: rgb(249, 174, 8);
+				background-color: rgba(249, 174, 8, .1);
+			"
+		>
+			<i
+				class="nexmoefont icon-QQ"
+			></i> </a
+		><a
+			class="mdui-ripple"
+			href="https://github.com/nexmoe/"
+			target="_blank"
+			mdui-tooltip="{content: 'GitHub'}"
+			style="
+				color: rgb(25, 23, 23);
+				background-color: rgba(25, 23, 23, .1);
+			"
+		>
+			<i
+				class="nexmoefont icon-github"
+			></i> </a
+		>
+	</div>
+</div>
+
+    
+        
+        
+  <div class="nexmoe-widget-wrap">
+    <h3 class="nexmoe-widget-title">文章分类</h3>
+    <div class="nexmoe-widget">
+
+      <ul class="category-list">
+
+        
+
+
+        
+
+        
+
+        <li class="category-list-item">
+          <a class="category-list-link" href="/categories/ACM/">ACM</a>
+          <span class="category-list-count">1</span>
+        </li>
+
+        
+
+        <li class="category-list-item">
+          <a class="category-list-link" href="/categories/CTF/">CTF</a>
+          <span class="category-list-count">7</span>
+        </li>
+
+        
+
+        <li class="category-list-item">
+          <a class="category-list-link" href="/categories/开发/">开发</a>
+          <span class="category-list-count">1</span>
+        </li>
+
+        
+
+        <li class="category-list-item">
+          <a class="category-list-link" href="/categories/机器学习/">机器学习</a>
+          <span class="category-list-count">1</span>
+        </li>
+
+        
+      </ul>
+
+    </div>
+  </div>
+
+
+    
+        
+        
+  <div class="nexmoe-widget-wrap">
+    <div id="randomtagcloud" class="nexmoe-widget tagcloud nexmoe-rainbow">
+      <a href="/tags/DP/" style="font-size: 10px;">DP</a> <a href="/tags/Laravel/" style="font-size: 10px;">Laravel</a> <a href="/tags/MySQL/" style="font-size: 10px;">MySQL</a> <a href="/tags/SSRF/" style="font-size: 10px;">SSRF</a> <a href="/tags/SSTI/" style="font-size: 10px;">SSTI</a> <a href="/tags/Yii%E6%A8%A1%E6%9D%BF/" style="font-size: 10px;">Yii模板</a> <a href="/tags/pickle/" style="font-size: 10px;">pickle</a> <a href="/tags/pwn/" style="font-size: 10px;">pwn</a> <a href="/tags/web/" style="font-size: 20px;">web</a> <a href="/tags/%E5%8F%8D%E5%BA%8F%E5%88%97%E5%8C%96/" style="font-size: 15px;">反序列化</a> <a href="/tags/%E7%A5%9E%E7%BB%8F%E7%BD%91%E7%BB%9C/" style="font-size: 10px;">神经网络</a> <a href="/tags/%E7%AE%97%E6%B3%95/" style="font-size: 10px;">算法</a>
+    </div>
+    
+      <script>
+        var maxTagcloud = parseInt(17);
+        var tags_length = parseInt(12);
+        var tags_arr = [];
+        for(var i = 0; i < tags_length; i++){
+          tags_arr.push(i);
+        }
+        tags_arr.sort(function (l, r) {
+          return Math.random() > 0.5 ? -1 : 1;
+        });
+        tags_arr = tags_arr.slice(0, maxTagcloud < tags_length ? tags_length - maxTagcloud : 0);
+        for(var tag_i = 0; tag_i < tags_arr.length; tag_i++){
+          document.getElementById("randomtagcloud").children[tags_arr[tag_i]].style.display = 'none';
+        }
+      </script>
+    
+  </div>
+
+    
+        
+        
+        
+  <div class="nexmoe-widget-wrap">
+    <h3 class="nexmoe-widget-title">文章归档</h3>
+    <div class="nexmoe-widget">
+      <ul class="archive-list"><li class="archive-list-item"><a class="archive-list-link" href="/archives/2023/">2023</a><span class="archive-list-count">2</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2022/">2022</a><span class="archive-list-count">11</span></li></ul>
+    </div>
+  </div>
+
+
+
+    
+        
+        
+  <div class="nexmoe-widget-wrap">
+    <h3 class="nexmoe-widget-title">最新文章</h3>
+    <div class="nexmoe-widget">
+      <ul>
+        
+          <li>
+            <a href="/2023/02/02/SSTI1/">缓冲区溢出</a>
+          </li>
+        
+          <li>
+            <a href="/2023/01/09/SSRF1/">SSRF</a>
+          </li>
+        
+          <li>
+            <a href="/2022/12/21/pwn_overflow/">缓冲区溢出</a>
+          </li>
+        
+          <li>
+            <a href="/2022/11/16/deeplearning/">深度学习基础</a>
+          </li>
+        
+          <li>
+            <a href="/2022/11/11/algorithm_dp/">DP模板</a>
+          </li>
+        
+      </ul>
+    </div>
+  </div>
+
+    
+        
+        <div class="nexmoe-widget-wrap">
+    <div class="nexmoe-widget nexmoe-link">
+		<ul>
+        
+		</ul>
+    </div>
+</div>
+<style>
+.nexmoe-widget-wrap .nexmoe-link ul li a {
+    text-align : center;
+}
+.nexmoe-widget-wrap .nexmoe-link ul li a img {
+    max-width : 100%;
+}
+.nexmoe-widget-wrap .nexmoe-link ul li a p {
+    margin: 10px 0;
+}
+</style>
+
+    
+   
+    <div class="nexmoe-copyright">
+        &copy; 2023 SourceRev
+        Powered by <a href="http://hexo.io/" target="_blank">Hexo</a>
+        & <a href="https://github.com/theme-nexmoe/hexo-theme-nexmoe" target="_blank">Nexmoe</a>
+        <br><a> </a>
+
+    </div>
+</div><!-- .nexmoe-drawer --></div><div id="nexmoe-content"><div class="nexmoe-primary"><div class="nexmoe-post">
+  <article>
+    
+        <div class="nexmoe-post-cover absolute" style="padding-top: 62.5%;"> 
+            <img src="/img/6.png" alt="缓冲区溢出" loading="lazy">
+            <h1>缓冲区溢出</h1>
+        </div>
+    
+    
+    <div class="nexmoe-post-meta">
+    <div class="nexmoe-rainbow">
+        <a class="nexmoefont icon-calendar-fill">2022年12月21日</a>
+        
+            <a class="nexmoefont icon-appstore-fill -link" href="/categories/CTF/">CTF</a>
+        
+        
+    <a><i class="nexmoefont icon-areachart"></i>约967字</a>
+    <a><i class="nexmoefont icon-time-circle-fill"></i>预计需要3分钟</a>
+
+    </div>
+    
+    
+    
+    
+    
+</div>
+
+    <h1 id="PWN入门"><a href="#PWN入门" class="headerlink" title="PWN入门"></a>PWN入门</h1><p>在CTF中，pwn主要是指通过程序本身的漏洞，编写利用脚本破解程序拿到系统的权限（shell），从而获得flag（通常为目标目录下文件内的一段随机字符串）这就要求我们对程序的各种函数，内存地址，堆栈空间，文件的结构有足够的了解。</p>
+<h2 id="缓冲区溢出"><a href="#缓冲区溢出" class="headerlink" title="缓冲区溢出"></a>缓冲区溢出</h2><h3 id="基础知识"><a href="#基础知识" class="headerlink" title="基础知识"></a>基础知识</h3><h4 id="GOT表"><a href="#GOT表" class="headerlink" title="GOT表"></a>GOT表</h4><p>Globle offset table 全局偏移量表，位于数据段，是一个每个条目是8字节地址的数组，用来存储外部函数在内存的确切地址，GOT表存储在数据段，（在IDA中是也就是.data段）可以在程序运行中被修改。</p>
+<p>hijack GOT：</p>
+<p>修改某一个被调用函数的地址，让其指向另一个函数，例如修改printf()函数的地址让其指向system(),这样做的结果就是原本对于printf()的调用就变成了调用system()函数。</p>
+<h4 id="PLT表"><a href="#PLT表" class="headerlink" title="PLT表"></a>PLT表</h4><p>procedure linkage table 过程连接表，位于代码段，是一个每个条目是16字节内容的数组。其中PLT[0]储存的信息能用来跳转到动态链接器中，PLT 是系统启动函数（__libc_start_main）,其余每个条目都负责调用一个具体的函数。</p>
+<p>用来存储外部函数的入口点，换而言之程序总会到PLT这里寻找外部函数的地址。</p>
+<p><strong>总结</strong>：plt表里是got表的地址got表是函数的真实地址。程序还未执行时，got表里还是plt表的地址，我们需要泄漏got表里的地址，</p>
+<p>若程序开启了ASLR，本地和远程的地址不一样，但也只是针对于地址中间位进行随机，最低的12位并不会发生改变，也就是我们需要获取到远程环境的函数的真实地址，进而判断libc的版本，计算泄漏的函数got表的地址与system的偏移，然后获取到system函数的真实地址，进而计算system函数与&#x2F;bin&#x2F;sh的偏移，最终getshell</p>
+<h3 id="基础语法"><a href="#基础语法" class="headerlink" title="基础语法"></a>基础语法</h3><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta prompt_"># </span><span class="language-bash">检查文件的基本信息</span></span><br><span class="line">file stack1</span><br><span class="line"><span class="meta prompt_"># </span><span class="language-bash">检查名为stack1的二进制文件是否开启保护</span></span><br><span class="line">checksec --file=stack1</span><br></pre></td></tr></table></figure>
+
+<h2 id="格式化字符串漏洞"><a href="#格式化字符串漏洞" class="headerlink" title="格式化字符串漏洞"></a>格式化字符串漏洞</h2><p>类似c语言的 <code>printf</code> ，<code>sprintf</code> ，<code>snprintf</code> 等格式化字符串用于接收可变参数，当程序编写不规范时：</p>
+<blockquote>
+<p>正确写法：printf(“%s”,string)</p>
+<p>错误写法：printf(string)</p>
+</blockquote>
+<p>出现类似的情况时，就会出现格式话字符串漏洞</p>
+<h3 id="利用方式"><a href="#利用方式" class="headerlink" title="利用方式"></a>利用方式</h3><p>构造一个payload来寻找输入字符串到栈顶指针的偏移，然后利用找到的偏移，在偏移处填入目的地址可以实现目的地址的内容泄露以及内容改写。</p>
+<p>例如 [第五空间2019 决赛]PWN5：</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br></pre></td><td class="code"><pre><span class="line"><span class="type">int</span> __cdecl <span class="title function_">main</span><span class="params">(<span class="type">int</span> a1)</span></span><br><span class="line">&#123;</span><br><span class="line">  <span class="type">unsigned</span> <span class="type">int</span> v1; <span class="comment">// eax</span></span><br><span class="line">  <span class="type">int</span> result; <span class="comment">// eax</span></span><br><span class="line">  <span class="type">int</span> fd; <span class="comment">// [esp+0h] [ebp-84h]</span></span><br><span class="line">  <span class="type">char</span> nptr[<span class="number">16</span>]; <span class="comment">// [esp+4h] [ebp-80h] BYREF</span></span><br><span class="line">  <span class="type">char</span> buf[<span class="number">100</span>]; <span class="comment">// [esp+14h] [ebp-70h] BYREF</span></span><br><span class="line">  <span class="type">unsigned</span> <span class="type">int</span> v6; <span class="comment">// [esp+78h] [ebp-Ch]</span></span><br><span class="line">  <span class="type">int</span> *v7; <span class="comment">// [esp+7Ch] [ebp-8h]</span></span><br><span class="line"></span><br><span class="line">  v7 = &amp;a1;</span><br><span class="line">  v6 = __readgsdword(<span class="number">0x14</span>u);</span><br><span class="line">  setvbuf(<span class="built_in">stdout</span>, <span class="number">0</span>, <span class="number">2</span>, <span class="number">0</span>);</span><br><span class="line">  v1 = time(<span class="number">0</span>);</span><br><span class="line">  srand(v1);</span><br><span class="line">  fd = open(<span class="string">&quot;/dev/urandom&quot;</span>, <span class="number">0</span>);</span><br><span class="line">  read(fd, &amp;dword_804C044, <span class="number">4u</span>);</span><br><span class="line">  <span class="built_in">printf</span>(<span class="string">&quot;your name:&quot;</span>);</span><br><span class="line">  read(<span class="number">0</span>, buf, <span class="number">0x63</span>u);</span><br><span class="line">  <span class="built_in">printf</span>(<span class="string">&quot;Hello,&quot;</span>);</span><br><span class="line">  <span class="built_in">printf</span>(buf);</span><br><span class="line">  <span class="built_in">printf</span>(<span class="string">&quot;your passwd:&quot;</span>);</span><br><span class="line">  read(<span class="number">0</span>, nptr, <span class="number">0xF</span>u);</span><br><span class="line">  <span class="keyword">if</span> ( atoi(nptr) == dword_804C044 )</span><br><span class="line">  &#123;</span><br><span class="line">    <span class="built_in">puts</span>(<span class="string">&quot;ok!!&quot;</span>);</span><br><span class="line">    system(<span class="string">&quot;/bin/sh&quot;</span>);</span><br><span class="line">  &#125;</span><br><span class="line">  <span class="keyword">else</span></span><br><span class="line">  &#123;</span><br><span class="line">    <span class="built_in">puts</span>(<span class="string">&quot;fail&quot;</span>);</span><br><span class="line">  &#125;</span><br><span class="line">  result = <span class="number">0</span>;</span><br><span class="line">  <span class="keyword">if</span> ( __readgsdword(<span class="number">0x14</span>u) != v6 )</span><br><span class="line">    sub_80493D0();</span><br><span class="line">  <span class="keyword">return</span> result;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>由于其功能是从 <code>/dev/urandom</code> 文件读取一个随机数，比对输入的 <code>passwd</code> 是否与该随机数一致，一致则getshell，而 <code>printf</code> 函数没有设定格式化参数，与输入的 <code>passwd</code> 比较的数字的地址也可以看到是 <code>0x804C044</code>，因此可以利用格式化字符串漏洞，在第一次输入 <code>name</code> 的时候修改 <code>0x804C044</code> 的内容，第二次输入 <code>passwd</code> 时输入改内容（字符串格式，用 <code>str</code> 函数，其参数为16进制数字）</p>
+
+    <p><img src="" loading="lazy"></p>
+
+  </article>
+
+  
+      
+    <div class="nexmoe-post-copyright">
+        <strong>本文作者：</strong>SourceRev<br>
+        <strong>本文链接：</strong><a href="http://sourcerev.github.io/2022/12/21/pwn_overflow/" title="http:&#x2F;&#x2F;sourcerev.github.io&#x2F;2022&#x2F;12&#x2F;21&#x2F;pwn_overflow&#x2F;" target="_blank" rel="noopener">http:&#x2F;&#x2F;sourcerev.github.io&#x2F;2022&#x2F;12&#x2F;21&#x2F;pwn_overflow&#x2F;</a><br>
+        
+            <strong>版权声明：</strong>本文采用 <a href="https://creativecommons.org/licenses/by-nc-sa/3.0/cn/deed.zh" target="_blank">CC BY-NC-SA 3.0 CN</a> 协议进行许可
+
+        
+    </div>
+
+
+  
+  
+  <div class="nexmoe-post-meta nexmoe-rainbow">
+   
+    
+        <a class="nexmoefont icon-tag-fill -none-link" href="/tags/pwn/" rel="tag">pwn</a>
+    
+</div>
+  
+  
+    <script async src="/js/copy-codeblock.js?v=1681305066655"></script>
+  
+
+  
+      <div class="nexmoe-post-footer">
+          <br><a>这是一个假的评论区</a>
+
+      </div>
+  
+</div></div><div class="nexmoe-post-right">    <div class="nexmoe-fixed">
+        <div class="nexmoe-tool">
+
+            
+
+            
+            
+            <button class="mdui-fab catalog" style="overflow:unset;">
+                <i class="nexmoefont icon-i-catalog"></i>
+                <div class="nexmoe-toc">
+                    <ol class="toc"><li class="toc-item toc-level-1"><a class="toc-link" href="#PWN%E5%85%A5%E9%97%A8"><span class="toc-number">1.</span> <span class="toc-text">PWN入门</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#%E7%BC%93%E5%86%B2%E5%8C%BA%E6%BA%A2%E5%87%BA"><span class="toc-number">1.1.</span> <span class="toc-text">缓冲区溢出</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#%E5%9F%BA%E7%A1%80%E7%9F%A5%E8%AF%86"><span class="toc-number">1.1.1.</span> <span class="toc-text">基础知识</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#GOT%E8%A1%A8"><span class="toc-number">1.1.1.1.</span> <span class="toc-text">GOT表</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#PLT%E8%A1%A8"><span class="toc-number">1.1.1.2.</span> <span class="toc-text">PLT表</span></a></li></ol></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E5%9F%BA%E7%A1%80%E8%AF%AD%E6%B3%95"><span class="toc-number">1.1.2.</span> <span class="toc-text">基础语法</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E6%A0%BC%E5%BC%8F%E5%8C%96%E5%AD%97%E7%AC%A6%E4%B8%B2%E6%BC%8F%E6%B4%9E"><span class="toc-number">1.2.</span> <span class="toc-text">格式化字符串漏洞</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#%E5%88%A9%E7%94%A8%E6%96%B9%E5%BC%8F"><span class="toc-number">1.2.1.</span> <span class="toc-text">利用方式</span></a></li></ol></li></ol></li></ol>
+                </div>
+            </button>
+            
+
+            
+
+            <a href="#nexmoe-content" class="toc-link" aria-label="Back To Top" title="top"><button class="mdui-fab mdui-ripple"><i class="nexmoefont icon-caret-top"></i></button></a>
+        </div>
+    </div>
+</div></div><div id="nexmoe-footer"><!--!--></div><div><div id="nexmoe-search-space">
+	<div class="search-container">
+		<div class="search-header">
+			<div class="search-input-container">
+				<input
+					class="search-input"
+					type="text"
+					placeholder="搜索"
+					oninput="sinput();"
+				/>
+			</div>
+			<a class="search-close" onclick="sclose();">×</a>
+		</div>
+		<div class="search-body"></div>
+	</div>
+</div>
+</div><div><script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-2058306854838448" crossorigin="anonymous"></script>
+</div></body></html>

